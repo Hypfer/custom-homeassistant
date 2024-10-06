@@ -1,0 +1,21 @@
+Index: homeassistant/components/default_config/manifest.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/homeassistant/components/default_config/manifest.json b/homeassistant/components/default_config/manifest.json
+--- a/homeassistant/components/default_config/manifest.json     (revision d7ac53ae93c52cc4fc604b6e814cf8bd896ba7b0)
++++ b/homeassistant/components/default_config/manifest.json     (date 1728199426389)
+@@ -5,12 +5,10 @@
+   "dependencies": [
+     "assist_pipeline",
+     "bluetooth",
+-    "cloud",
+     "conversation",
+     "dhcp",
+     "energy",
+     "history",
+-    "homeassistant_alerts",
+     "logbook",
+     "map",
+     "media_source",
