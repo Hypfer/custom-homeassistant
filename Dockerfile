@@ -1,10 +1,7 @@
-FROM ghcr.io/home-assistant/home-assistant:2024.11.1
+FROM ghcr.io/home-assistant/home-assistant:2024.12.0
 
 # Allow patching
 RUN apk add gzip patch
-
-# For shutting down windows computers via the network
-RUN apk add samba-client samba-common-tools
 
 # Actual patching
 COPY patches /patches
