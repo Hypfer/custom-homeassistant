@@ -1,0 +1,19 @@
+Index: homeassistant/components/mqtt/update.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/homeassistant/components/mqtt/update.py b/homeassistant/components/mqtt/update.py
+--- a/homeassistant/components/mqtt/update.py	(revision bd409a76f1fd5b410d3e42df25b208eb23173808)
++++ b/homeassistant/components/mqtt/update.py	(date 1735550960413)
+@@ -104,10 +104,6 @@
+
+     @property
+     def entity_picture(self) -> str | None:
+-        """Return the entity picture to use in the frontend."""
+-        if self._attr_entity_picture is not None:
+-            return self._attr_entity_picture
+-
+         return super().entity_picture
+
+     @staticmethod

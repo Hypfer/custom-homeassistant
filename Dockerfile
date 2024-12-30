@@ -10,6 +10,10 @@ RUN for patch in /patches/hass/*.patch; do \
     patch -p1 -d /usr/src/homeassistant < "$patch"; \
 done
 
+RUN for i in $(find /usr/src/homeassistant -type f -name "*.py"); do \
+    sed -i 's/https:\/\/brands.home-assistant.io/\/local\/brands/g' "$i"; \
+done
+
 
 RUN PYTHON_SITE_PACKAGES_DIR=$(python3 -c 'import site; print(site.getsitepackages()[0])') && \
     for patch in /patches/py/*.patch; do \
