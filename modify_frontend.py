@@ -14,6 +14,7 @@ log(f"Frontend directory: {frontend_dir}")
 
 replacements = [
     ("https://brands.home-assistant.io", "/local/brands"),
+    ("animation:shimmer 2.5s infinite", "animation:none"),
 ]
 log("Replacements to perform:")
 for old, new in replacements:
