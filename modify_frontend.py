@@ -14,8 +14,6 @@ log(f"Frontend directory: {frontend_dir}")
 
 replacements = [
     ("https://brands.home-assistant.io", "/local/brands"),
-    (".zoom-hint{", ".zoom-hint{display:none !important;"),
-    ("\"home\"!==t.state&&", ""),
 ]
 log("Replacements to perform:")
 for old, new in replacements:
