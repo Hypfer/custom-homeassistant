@@ -26,3 +26,9 @@ RUN PYTHON_SITE_PACKAGES_DIR=$(python3 -c 'import site; print(site.getsitepackag
 COPY modify_frontend.py /
 RUN PYTHON_SITE_PACKAGES_DIR=$(python3 -c 'import site; print(site.getsitepackages()[0])') && \
     python3 /modify_frontend.py "$PYTHON_SITE_PACKAGES_DIR/hass_frontend/"
+
+
+COPY modify_custom_components.py /
+COPY custom_entrypoint.sh /custom_entrypoint.sh
+RUN chmod +x /custom_entrypoint.sh
+ENTRYPOINT ["/custom_entrypoint.sh"]
