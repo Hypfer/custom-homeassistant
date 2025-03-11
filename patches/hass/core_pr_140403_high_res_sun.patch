@@ -1,0 +1,24 @@
+From 91958251b742b5da462ec5fa9404bc87a9aa4953 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?S=C3=B6ren=20Beye?= <github@hypfer.de>
+Date: Tue, 11 Mar 2025 19:44:59 +0100
+Subject: [PATCH] Increase resolution of sun updates around sunrise/sundown
+
+---
+ homeassistant/components/sun/entity.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/homeassistant/components/sun/entity.py b/homeassistant/components/sun/entity.py
+index 925845c8b4d99..4070190e52abe 100644
+--- a/homeassistant/components/sun/entity.py
++++ b/homeassistant/components/sun/entity.py
+@@ -74,8 +74,8 @@
+ _PHASE_UPDATES = {
+     PHASE_NIGHT: timedelta(minutes=4 * 5),
+     PHASE_ASTRONOMICAL_TWILIGHT: timedelta(minutes=4 * 2),
+-    PHASE_NAUTICAL_TWILIGHT: timedelta(minutes=4 * 2),
+-    PHASE_TWILIGHT: timedelta(minutes=4),
++    PHASE_NAUTICAL_TWILIGHT: timedelta(minutes=4),
++    PHASE_TWILIGHT: timedelta(minutes=2),
+     PHASE_SMALL_DAY: timedelta(minutes=2),
+     PHASE_DAY: timedelta(minutes=4),
+ }
