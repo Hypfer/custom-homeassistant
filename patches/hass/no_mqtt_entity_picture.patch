@@ -4,16 +4,15 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
 diff --git a/homeassistant/components/mqtt/update.py b/homeassistant/components/mqtt/update.py
---- a/homeassistant/components/mqtt/update.py	(revision bd409a76f1fd5b410d3e42df25b208eb23173808)
-+++ b/homeassistant/components/mqtt/update.py	(date 1735550960413)
-@@ -104,10 +104,6 @@
+--- a/homeassistant/components/mqtt/update.py	(revision e86e79384218e7ec401dce7cc542e27277fcb810)
++++ b/homeassistant/components/mqtt/update.py	(date 1749754817489)
+@@ -213,9 +213,6 @@
+         if "release_url" in json_payload:
+             self._attr_release_url = json_payload["release_url"]
 
-     @property
-     def entity_picture(self) -> str | None:
--        """Return the entity picture to use in the frontend."""
--        if self._attr_entity_picture is not None:
--            return self._attr_entity_picture
+-        if "entity_picture" in json_payload:
+-            self._attr_entity_picture = json_payload["entity_picture"]
 -
-         return super().entity_picture
-
-     @staticmethod
+         if "update_percentage" in json_payload:
+             self._attr_update_percentage = json_payload["update_percentage"]
+             self._attr_in_progress = self._attr_update_percentage is not None
