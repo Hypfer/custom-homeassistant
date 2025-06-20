@@ -1,0 +1,115 @@
+Index: homeassistant/components/squeezebox/media_player.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/homeassistant/components/squeezebox/media_player.py b/homeassistant/components/squeezebox/media_player.py
+--- a/homeassistant/components/squeezebox/media_player.py	(revision 73bed96a0f2ac2c6bde3394cfcee21e27e2ad57c)
++++ b/homeassistant/components/squeezebox/media_player.py	(date 1750411607546)
+@@ -4,10 +4,12 @@
+
+ from collections.abc import Callable
+ from datetime import datetime
++import hashlib
+ import json
+ import logging
+ from typing import TYPE_CHECKING, Any, cast
+
++from lru import LRU
+ from pysqueezebox import Server, async_discover
+ import voluptuous as vol
+
+@@ -92,6 +94,8 @@
+     "stop": MediaPlayerState.IDLE,
+ }
+
++SYNTHETIC_ID_PREFIX = "synthetic_"
++
+
+ async def start_server_discovery(hass: HomeAssistant) -> None:
+     """Start a server discovery task."""
+@@ -220,6 +224,7 @@
+         self._previous_media_position = 0
+         self._attr_unique_id = format_mac(self._player.player_id)
+         self._browse_data = BrowseData()
++        self._synthetic_media_browser_thumbnail_items: LRU[str, str] = LRU(5000)
+
+     @callback
+     def _handle_coordinator_update(self) -> None:
+@@ -695,6 +700,18 @@
+         await self._player.async_unsync()
+         await self.coordinator.async_refresh()
+
++    def get_synthetic_id_and_cache_url(self, url: str) -> str:
++        """Cache a thumbnail URL and return a synthetic ID.
++
++        This enables us to proxy thumbnails for apps and favorites, as those do not have IDs.
++        """
++        url_hash = hashlib.md5(url.encode()).hexdigest()
++        synthetic_id = f"{SYNTHETIC_ID_PREFIX}{url_hash}"
++
++        self._synthetic_media_browser_thumbnail_items[synthetic_id] = url
++
++        return synthetic_id
++
+     async def async_browse_media(
+         self,
+         media_content_type: MediaType | str | None = None,
+@@ -739,7 +756,19 @@
+     ) -> tuple[bytes | None, str | None]:
+         """Get album art from Squeezebox server."""
+         if media_image_id:
+-            image_url = self._player.generate_image_url_from_track_id(media_image_id)
++            if media_image_id.startswith(SYNTHETIC_ID_PREFIX):
++                image_url = self._synthetic_media_browser_thumbnail_items.get(
++                    media_image_id
++                )
++
++                if image_url is None:
++                    _LOGGER.debug("Synthetic ID %s not found in cache", media_image_id)
++                    return (None, None)
++            else:
++                image_url = self._player.generate_image_url_from_track_id(
++                    media_image_id
++                )
++
+             result = await self._async_fetch_image(image_url)
+             if result == (None, None):
+                 _LOGGER.debug("Error retrieving proxied album art from %s", image_url)
+Index: homeassistant/components/squeezebox/browse_media.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/homeassistant/components/squeezebox/browse_media.py b/homeassistant/components/squeezebox/browse_media.py
+--- a/homeassistant/components/squeezebox/browse_media.py	(revision 73bed96a0f2ac2c6bde3394cfcee21e27e2ad57c)
++++ b/homeassistant/components/squeezebox/browse_media.py	(date 1750412026106)
+@@ -229,10 +229,26 @@
+                 item_type, item["id"], artwork_track_id
+             )
+
+-    elif search_type in ["apps", "radios"]:
+-        item_thumbnail = player.generate_image_url(item["icon"])
+-    if item_thumbnail is None:
+-        item_thumbnail = item.get("image_url")  # will not be proxied by HA
++    else:
++        url = None
++        content_type = item_type or "unknown"
++
++        if search_type in ["apps", "radios"]:
++            url = player.generate_image_url(item["icon"])
++        elif image_url := item.get("image_url"):
++            url = image_url
++
++        if url:
++            if internal_request:
++                item_thumbnail = url
++            elif hasattr(entity, "get_synthetic_id_and_cache_url"):
++                synthetic_id = entity.get_synthetic_id_and_cache_url(url)
++                item_thumbnail = entity.get_browse_image_url(
++                    content_type, "synthetic", synthetic_id
++                )
++            else:
++                item_thumbnail = url
++
+     return item_thumbnail
