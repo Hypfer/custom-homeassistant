@@ -1,0 +1,19 @@
+Subject: [PATCH] Squeezebox: Updates are not always automatic
+---
+Index: homeassistant/components/squeezebox/update.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/homeassistant/components/squeezebox/update.py b/homeassistant/components/squeezebox/update.py
+--- a/homeassistant/components/squeezebox/update.py	(revision 73bed96a0f2ac2c6bde3394cfcee21e27e2ad57c)
++++ b/homeassistant/components/squeezebox/update.py	(date 1750627169885)
+@@ -52,6 +52,8 @@
+ ) -> None:
+     """Platform setup using common elements."""
+
++    return
++
+     async_add_entities(
+         [
+             ServerStatusUpdateLMS(entry.runtime_data.coordinator, newserver),
