@@ -1,0 +1,39 @@
+Index: homeassistant/components/update/__init__.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/homeassistant/components/update/__init__.py b/homeassistant/components/update/__init__.py
+--- a/homeassistant/components/update/__init__.py	(revision 73bed96a0f2ac2c6bde3394cfcee21e27e2ad57c)
++++ b/homeassistant/components/update/__init__.py	(date 1750628702062)
+@@ -159,19 +159,13 @@
+
+ async def async_skip(entity: UpdateEntity, service_call: ServiceCall) -> None:
+     """Service call wrapper to validate the call."""
+-    if entity.auto_update:
+-        raise HomeAssistantError(
+-            f"Skipping update is not supported for {entity.entity_id}"
+-        )
++
+     await entity.async_skip()
+
+
+ async def async_clear_skipped(entity: UpdateEntity, service_call: ServiceCall) -> None:
+     """Service call wrapper to validate the call."""
+-    if entity.auto_update:
+-        raise HomeAssistantError(
+-            f"Clearing skipped update is not supported for {entity.entity_id}"
+-        )
++
+     await entity.async_clear_skipped()
+
+
+@@ -240,7 +234,7 @@
+     @cached_property
+     def auto_update(self) -> bool:
+         """Indicate if the device or service has auto update enabled."""
+-        return self._attr_auto_update
++        return False
+
+     @cached_property
+     def installed_version(self) -> str | None:
