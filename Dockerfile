@@ -1,4 +1,4 @@
-FROM ghcr.io/home-assistant/home-assistant:2025.7.0b4
+FROM ghcr.io/home-assistant/home-assistant:2025.9.0
 
 # Allow patching
 RUN apk add gzip patch brotli
