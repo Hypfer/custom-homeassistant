@@ -1,17 +1,106 @@
-Index: homeassistant/components/squeezebox/media_player.py
-IDEA additional info:
-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
-<+>UTF-8
-===================================================================
-diff --git a/homeassistant/components/squeezebox/media_player.py b/homeassistant/components/squeezebox/media_player.py
---- a/homeassistant/components/squeezebox/media_player.py	(revision 73bed96a0f2ac2c6bde3394cfcee21e27e2ad57c)
-+++ b/homeassistant/components/squeezebox/media_player.py	(date 1750411607546)
-@@ -4,10 +4,12 @@
+From 07a78cf6f7af61a55c88dccfff2d0b479f43a09e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?S=C3=B6ren=20Beye?= <github@hypfer.de>
+Date: Sat, 27 Sep 2025 14:39:15 +0200
+Subject: [PATCH] Squeezebox: Proxy all the thumbnails (#147199)
 
- from collections.abc import Callable
- from datetime import datetime
-+import hashlib
- import json
+Co-authored-by: Erik Montnemery <erik@montnemery.com>
+---
+ .../components/squeezebox/browse_media.py     | 37 +++++++++++--------
+ .../components/squeezebox/media_player.py     | 36 +++++++++++++++---
+ .../squeezebox/test_media_browser.py          | 32 ++++++++++++++++
+ 3 files changed, 84 insertions(+), 21 deletions(-)
+
+diff --git a/homeassistant/components/squeezebox/browse_media.py b/homeassistant/components/squeezebox/browse_media.py
+index 436308a8920d6..2ca9d6f058c9d 100644
+--- a/homeassistant/components/squeezebox/browse_media.py
++++ b/homeassistant/components/squeezebox/browse_media.py
+@@ -5,7 +5,7 @@
+ import contextlib
+ from dataclasses import dataclass, field
+ import logging
+-from typing import Any
++from typing import TYPE_CHECKING, Any, cast
+
+ from pysqueezebox import Player
+
+@@ -14,7 +14,6 @@
+     BrowseError,
+     BrowseMedia,
+     MediaClass,
+-    MediaPlayerEntity,
+     MediaType,
+ )
+ from homeassistant.core import HomeAssistant
+@@ -22,6 +21,9 @@
+
+ from .const import DOMAIN, UNPLAYABLE_TYPES
+
++if TYPE_CHECKING:
++    from .media_player import SqueezeBoxMediaPlayerEntity
++
+ _LOGGER = logging.getLogger(__name__)
+
+ LIBRARY = [
+@@ -244,14 +246,13 @@ def _build_response_favorites(item: dict[str, Any]) -> BrowseMedia:
+ def _get_item_thumbnail(
+     item: dict[str, Any],
+     player: Player,
+-    entity: MediaPlayerEntity,
++    entity: SqueezeBoxMediaPlayerEntity,
+     item_type: str | MediaType | None,
+     search_type: str,
+     internal_request: bool,
+     known_apps_radios: set[str],
+ ) -> str | None:
+     """Construct path to thumbnail image."""
+-    item_thumbnail: str | None = None
+
+     track_id = item.get("artwork_track_id") or (
+         item.get("id")
+@@ -262,21 +263,27 @@ def _get_item_thumbnail(
+
+     if track_id:
+         if internal_request:
+-            item_thumbnail = player.generate_image_url_from_track_id(track_id)
+-        elif item_type is not None:
+-            item_thumbnail = entity.get_browse_image_url(
+-                item_type, item["id"], track_id
+-            )
++            return cast(str, player.generate_image_url_from_track_id(track_id))
++        if item_type is not None:
++            return entity.get_browse_image_url(item_type, item["id"], track_id)
++
++    url = None
++    content_type = item_type or "unknown"
++
++    if search_type in ["apps", "radios"]:
++        url = cast(str, player.generate_image_url(item["icon"]))
++    elif image_url := item.get("image_url"):
++        url = image_url
++
++    if internal_request or not url:
++        return url
+
+-    elif search_type in ["apps", "radios"]:
+-        item_thumbnail = player.generate_image_url(item["icon"])
+-    if item_thumbnail is None:
+-        item_thumbnail = item.get("image_url")  # will not be proxied by HA
+-    return item_thumbnail
++    synthetic_id = entity.get_synthetic_id_and_cache_url(url)
++    return entity.get_browse_image_url(content_type, "synthetic", synthetic_id)
+
+
+ async def build_item_response(
+-    entity: MediaPlayerEntity,
++    entity: SqueezeBoxMediaPlayerEntity,
+     player: Player,
+     payload: dict[str, str | None],
+     browse_limit: int,
+diff --git a/homeassistant/components/squeezebox/media_player.py b/homeassistant/components/squeezebox/media_player.py
+index d1313eccc37bd..0b9b54a1dcddb 100644
+--- a/homeassistant/components/squeezebox/media_player.py
++++ b/homeassistant/components/squeezebox/media_player.py
+@@ -8,6 +8,7 @@
  import logging
  from typing import TYPE_CHECKING, Any, cast
 
@@ -19,16 +108,15 @@ diff --git a/homeassistant/components/squeezebox/media_player.py b/homeassistant
  from pysqueezebox import Server, async_discover
  import voluptuous as vol
 
-@@ -92,6 +94,8 @@
-     "stop": MediaPlayerState.IDLE,
- }
+@@ -43,6 +44,7 @@
+ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+ from homeassistant.helpers.start import async_at_start
+ from homeassistant.util.dt import utcnow
++from homeassistant.util.ulid import ulid_now
 
-+SYNTHETIC_ID_PREFIX = "synthetic_"
-+
-
- async def start_server_discovery(hass: HomeAssistant) -> None:
-     """Start a server discovery task."""
-@@ -220,6 +224,7 @@
+ from . import SQUEEZEBOX_HASS_DATA
+ from .browse_media import (
+@@ -260,6 +262,7 @@ def __init__(self, coordinator: SqueezeBoxPlayerUpdateCoordinator) -> None:
          self._previous_media_position = 0
          self._attr_unique_id = format_mac(self._player.player_id)
          self._browse_data = BrowseData()
@@ -36,7 +124,7 @@ diff --git a/homeassistant/components/squeezebox/media_player.py b/homeassistant
 
      @callback
      def _handle_coordinator_update(self) -> None:
-@@ -695,6 +700,18 @@
+@@ -742,6 +745,17 @@ async def async_unjoin_player(self) -> None:
          await self._player.async_unsync()
          await self.coordinator.async_refresh()
 
@@ -45,8 +133,7 @@ diff --git a/homeassistant/components/squeezebox/media_player.py b/homeassistant
 +
 +        This enables us to proxy thumbnails for apps and favorites, as those do not have IDs.
 +        """
-+        url_hash = hashlib.md5(url.encode()).hexdigest()
-+        synthetic_id = f"{SYNTHETIC_ID_PREFIX}{url_hash}"
++        synthetic_id = f"s_{ulid_now()}"
 +
 +        self._synthetic_media_browser_thumbnail_items[synthetic_id] = url
 +
@@ -55,61 +142,31 @@ diff --git a/homeassistant/components/squeezebox/media_player.py b/homeassistant
      async def async_browse_media(
          self,
          media_content_type: MediaType | str | None = None,
-@@ -739,7 +756,19 @@
+@@ -785,11 +799,21 @@ async def async_get_browse_image(
+         media_image_id: str | None = None,
      ) -> tuple[bytes | None, str | None]:
          """Get album art from Squeezebox server."""
-         if media_image_id:
--            image_url = self._player.generate_image_url_from_track_id(media_image_id)
-+            if media_image_id.startswith(SYNTHETIC_ID_PREFIX):
-+                image_url = self._synthetic_media_browser_thumbnail_items.get(
-+                    media_image_id
-+                )
+-        if media_image_id:
++        if not media_image_id:
++            return (None, None)
 +
-+                if image_url is None:
-+                    _LOGGER.debug("Synthetic ID %s not found in cache", media_image_id)
-+                    return (None, None)
-+            else:
-+                image_url = self._player.generate_image_url_from_track_id(
-+                    media_image_id
-+                )
++        if media_content_id == "synthetic":
++            image_url = self._synthetic_media_browser_thumbnail_items.get(
++                media_image_id
++            )
 +
-             result = await self._async_fetch_image(image_url)
-             if result == (None, None):
-                 _LOGGER.debug("Error retrieving proxied album art from %s", image_url)
-Index: homeassistant/components/squeezebox/browse_media.py
-IDEA additional info:
-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
-<+>UTF-8
-===================================================================
-diff --git a/homeassistant/components/squeezebox/browse_media.py b/homeassistant/components/squeezebox/browse_media.py
---- a/homeassistant/components/squeezebox/browse_media.py	(revision 73bed96a0f2ac2c6bde3394cfcee21e27e2ad57c)
-+++ b/homeassistant/components/squeezebox/browse_media.py	(date 1750412026106)
-@@ -229,10 +229,26 @@
-                 item_type, item["id"], artwork_track_id
-             )
++            if image_url is None:
++                _LOGGER.debug("Synthetic ID %s not found in cache", media_image_id)
++                return (None, None)
++        else:
+             image_url = self._player.generate_image_url_from_track_id(media_image_id)
+-            result = await self._async_fetch_image(image_url)
+-            if result == (None, None):
+-                _LOGGER.debug("Error retrieving proxied album art from %s", image_url)
+-            return result
 
--    elif search_type in ["apps", "radios"]:
--        item_thumbnail = player.generate_image_url(item["icon"])
--    if item_thumbnail is None:
--        item_thumbnail = item.get("image_url")  # will not be proxied by HA
-+    else:
-+        url = None
-+        content_type = item_type or "unknown"
-+
-+        if search_type in ["apps", "radios"]:
-+            url = player.generate_image_url(item["icon"])
-+        elif image_url := item.get("image_url"):
-+            url = image_url
-+
-+        if url:
-+            if internal_request:
-+                item_thumbnail = url
-+            elif hasattr(entity, "get_synthetic_id_and_cache_url"):
-+                synthetic_id = entity.get_synthetic_id_and_cache_url(url)
-+                item_thumbnail = entity.get_browse_image_url(
-+                    content_type, "synthetic", synthetic_id
-+                )
-+            else:
-+                item_thumbnail = url
-+
-     return item_thumbnail
+-        return (None, None)
++        result = await self._async_fetch_image(image_url)
++        if result == (None, None):
++            _LOGGER.debug("Error retrieving proxied album art from %s", image_url)
++        return result

@@ -4,9 +4,9 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
 diff --git a/homeassistant/components/default_config/manifest.json b/homeassistant/components/default_config/manifest.json
---- a/homeassistant/components/default_config/manifest.json	(revision 5ed7d327497c28e7920599ee9f5c7c0ed6b35e4c)
-+++ b/homeassistant/components/default_config/manifest.json	(date 1730470169507)
-@@ -5,13 +5,11 @@
+--- a/homeassistant/components/default_config/manifest.json	(revision 799cdec8d1529d83ee6f3862702ec066f64e3a14)
++++ b/homeassistant/components/default_config/manifest.json	(date 1759472456779)
+@@ -5,14 +5,12 @@
    "dependencies": [
      "assist_pipeline",
      "bluetooth",
@@ -14,6 +14,7 @@ diff --git a/homeassistant/components/default_config/manifest.json b/homeassista
      "conversation",
      "dhcp",
      "energy",
+     "file",
      "go2rtc",
      "history",
 -    "homeassistant_alerts",
