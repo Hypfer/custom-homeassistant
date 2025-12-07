@@ -1,4 +1,4 @@
-From 87ea7361393d4378bc9bab35c595c8a1624cf97d Mon Sep 17 00:00:00 2001
+From 10995742664c292b8eb14c1a1ce4b2ccf64a328e Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?S=C3=B6ren=20Beye?= <github@hypfer.de>
 Date: Sat, 28 Sep 2024 12:59:27 +0200
 Subject: [PATCH] Add support for Surround AI
@@ -13,10 +13,10 @@ Subject: [PATCH] Add support for Surround AI
  6 files changed, 38 insertions(+)
 
 diff --git a/aiomusiccast/capability_registry.py b/aiomusiccast/capability_registry.py
-index 06036b9..f1abd5a 100644
+index 31f8548..54661df 100644
 --- a/aiomusiccast/capability_registry.py
 +++ b/aiomusiccast/capability_registry.py
-@@ -252,6 +252,13 @@ def normalize_option(option):
+@@ -262,6 +262,13 @@ def normalize_option(option: object) -> str:
          lambda: device.data.zones[zone_id].surround_3d,
          lambda val: device.set_surround_3d(zone_id, val),
      ),
@@ -31,10 +31,10 @@ index 06036b9..f1abd5a 100644
 
 
 diff --git a/aiomusiccast/const.py b/aiomusiccast/const.py
-index 42ff7c7..fb55fdb 100644
+index c40f896..8568146 100644
 --- a/aiomusiccast/const.py
 +++ b/aiomusiccast/const.py
-@@ -49,6 +49,7 @@
+@@ -48,6 +48,7 @@
      "mute": ZoneFeature.MUTE,
      "sound_program": ZoneFeature.SOUND_PROGRAM,
      "surround_3d": ZoneFeature.SURROUND_3D,
@@ -43,10 +43,10 @@ index 42ff7c7..fb55fdb 100644
      "pure_direct": ZoneFeature.PURE_DIRECT,
      "enhancer": ZoneFeature.ENHANCER,
 diff --git a/aiomusiccast/features.py b/aiomusiccast/features.py
-index 796447a..1ad1f55 100644
+index 79e1204..6cf203b 100644
 --- a/aiomusiccast/features.py
 +++ b/aiomusiccast/features.py
-@@ -65,6 +65,7 @@ class ZoneFeature(Feature):
+@@ -64,6 +64,7 @@ class ZoneFeature(Feature):
      MUTE = auto()
      SOUND_PROGRAM = auto()
      SURROUND_3D = auto()
@@ -55,10 +55,10 @@ index 796447a..1ad1f55 100644
      PURE_DIRECT = auto()
      ENHANCER = auto()
 diff --git a/aiomusiccast/musiccast_data.py b/aiomusiccast/musiccast_data.py
-index 83c5e70..246d36b 100644
+index d5c5527..234ac1e 100644
 --- a/aiomusiccast/musiccast_data.py
 +++ b/aiomusiccast/musiccast_data.py
-@@ -172,6 +172,7 @@ def __init__(self):
+@@ -179,6 +179,7 @@ def __init__(self):
          self.pure_direct: bool | None = None
          self.clear_voice: bool | None = None
          self.surround_3d: bool | None = None
@@ -67,7 +67,7 @@ index 83c5e70..246d36b 100644
          self.surr_decoder_type: str | None = None
 
 diff --git a/aiomusiccast/musiccast_device.py b/aiomusiccast/musiccast_device.py
-index ac86625..a6dacaf 100644
+index ed45b93..90c61d1 100644
 --- a/aiomusiccast/musiccast_device.py
 +++ b/aiomusiccast/musiccast_device.py
 @@ -275,6 +275,7 @@ async def _fetch_zone(self, zone_id):
@@ -78,9 +78,9 @@ index ac86625..a6dacaf 100644
 
          zone_data.surr_decoder_type = zone.get("surr_decoder_type")
 
-@@ -805,6 +806,16 @@ async def set_surround_3d(self, zone_id, value):
-             )
-         )
+@@ -670,6 +671,16 @@ async def set_surround_3d(self, zone_id, value):
+         """Set 3d surround option."""
+         await self.device.request(Zone.set_surround_3d(zone_id, value))
 
 +    @_check_feature(ZoneFeature.SURROUND_AI)
 +    async def set_surround_ai(self, zone_id, value):
@@ -94,20 +94,20 @@ index ac86625..a6dacaf 100644
 +
      async def select_sound_mode(self, zone_id, sound_mode):
          """Select sound mode."""
-         await self.device.request(
+         await self.device.request(Zone.set_sound_program(zone_id, sound_mode))
 diff --git a/aiomusiccast/pyamaha.py b/aiomusiccast/pyamaha.py
-index 94ee270..88945c7 100644
+index 16e2bdb..8c5deca 100644
 --- a/aiomusiccast/pyamaha.py
 +++ b/aiomusiccast/pyamaha.py
-@@ -984,6 +984,7 @@ class Zone:
-         'SET_SOUND_PROGRAM': 'http://{host}/YamahaExtendedControl/v1/{zone}/setSoundProgram?program={program}',
-         'PREPARE_INPUT_CHANGE': 'http://{host}/YamahaExtendedControl/v1/{zone}/prepareInputChange?input={input}',
-         'SET_SURROUND_3D': 'http://{host}/YamahaExtendedControl/v1/{zone}/set3dSurround?enable={enable}',
-+        'SET_SURROUND_AI': 'http://{host}/YamahaExtendedControl/v1/{zone}/setSurroundAI?enable={enable}',
-         'SET_DIRECT': 'http://{host}/YamahaExtendedControl/v1/{zone}/setDirect?enable={enable}',
-         'SET_PURE_DIRECT': 'http://{host}/YamahaExtendedControl/v1/{zone}/setPureDirect?enable={enable}',
-         'SET_ENHANCER': 'http://{host}/YamahaExtendedControl/v1/{zone}/setEnhancer?enable={enable}',
-@@ -1190,6 +1191,22 @@ def set_surround_3d(zone, enable):
+@@ -1037,6 +1037,7 @@ class Zone:
+         "SET_SOUND_PROGRAM": "http://{host}/YamahaExtendedControl/v1/{zone}/setSoundProgram?program={program}",
+         "PREPARE_INPUT_CHANGE": "http://{host}/YamahaExtendedControl/v1/{zone}/prepareInputChange?input={input}",
+         "SET_SURROUND_3D": "http://{host}/YamahaExtendedControl/v1/{zone}/set3dSurround?enable={enable}",
++        "SET_SURROUND_AI": "http://{host}/YamahaExtendedControl/v1/{zone}/setSurroundAI?enable={enable}",
+         "SET_DIRECT": "http://{host}/YamahaExtendedControl/v1/{zone}/setDirect?enable={enable}",
+         "SET_PURE_DIRECT": "http://{host}/YamahaExtendedControl/v1/{zone}/setPureDirect?enable={enable}",
+         "SET_ENHANCER": "http://{host}/YamahaExtendedControl/v1/{zone}/setEnhancer?enable={enable}",
+@@ -1247,6 +1248,22 @@ def set_surround_3d(zone, enable):
 
      # end-of-method set_surround_3d
 
@@ -120,9 +120,9 @@ index 94ee270..88945c7 100644
 +                    Values: 'main', 'zone2', 'zone3', 'zone4'
 +            @param enable: Specifies Surround AI status.
 +        """
-+        assert zone in ZONES, 'Invalid ZONE value!'
-+        return Zone.URI['SET_SURROUND_AI'].format(
-+            host='{host}', zone=zone, enable=_bool_to_str(enable)
++        assert zone in ZONES, "Invalid ZONE value!"
++        return Zone.URI["SET_SURROUND_AI"].format(
++            host="{host}", zone=zone, enable=_bool_to_str(enable)
 +        )
 +
 +    # end-of-method set_surround_ai
