@@ -14,9 +14,16 @@ log(f"Frontend directory: {frontend_dir}")
 
 replacements = [
     ("https://brands.home-assistant.io", "/local/brands"),
+
+    # I do not understand why you would want constant interrupts firing in your brain from useless visual updates
     ("animation:shimmer 2.5s infinite", "animation:none"),
     ("matchMedia(\"(prefers-reduced-motion)\").matches", "true"),
+
+    # These behave oddly and ignore the actual theme light/dark setting, but I can't be bothered to fix it upstream
+    ("@media (prefers-color-scheme:dark)", "@media not all"),
+    ("@media (prefers-color-scheme: dark)", "@media not all"),
 ]
+
 log("Replacements to perform:")
 for old, new in replacements:
     log(f" - '{old}' -> '{new}'")
