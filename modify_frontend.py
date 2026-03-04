@@ -13,8 +13,6 @@ frontend_dir = sys.argv[1]
 log(f"Frontend directory: {frontend_dir}")
 
 replacements = [
-    ("https://brands.home-assistant.io", "/local/brands"),
-
     # I do not understand why you would want constant interrupts firing in your brain from useless visual updates
     ("animation:shimmer 2.5s infinite", "animation:none"),
     ("matchMedia(\"(prefers-reduced-motion)\").matches", "true"),
