@@ -1,0 +1,2660 @@
+diff --git a/src/components/entity/ha-entity-picker.ts b/src/components/entity/ha-entity-picker.ts
+index f12e9347e..e8cb647ba 100644
+--- a/src/components/entity/ha-entity-picker.ts
++++ b/src/components/entity/ha-entity-picker.ts
+@@ -337,6 +337,29 @@ export class HaEntityPicker extends LitElement {
+     return !!this._findExtraOption(this.value)?.hide_clear;
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("autofocus") || changedProps.has("disabled") || changedProps.has("required") ||
++        changedProps.has("allowCustomEntity") || changedProps.has("showEntityId") ||
++        changedProps.has("label") || changedProps.has("value") || changedProps.has("helper") ||
++        changedProps.has("placeholder") || changedProps.has("searchLabel") ||
++        changedProps.has("createDomains") ||
++        changedProps.has("addButton") || changedProps.has("addButtonLabel") ||
++        changedProps.has("hideClearIcon") || changedProps.has("includeDomains") ||
++        changedProps.has("excludeDomains") || changedProps.has("includeEntities") ||
++        changedProps.has("excludeEntities") || changedProps.has("entityFilter") ||
++        changedProps.has("includeDeviceClasses") || changedProps.has("includeUnitOfMeasurement") ||
++        changedProps.has("extraOptions")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    return (
++      oldHass.localize !== this.hass!.localize ||
++      oldHass.states !== this.hass!.states ||
++      oldHass.userData !== this.hass!.userData ||
++      oldHass.loadFragmentTranslation !== this.hass!.loadFragmentTranslation
++    );
++  }
++
+   protected render() {
+     const placeholder =
+       this.placeholder ??
+diff --git a/src/components/entity/ha-statistic-picker.ts b/src/components/entity/ha-statistic-picker.ts
+index 5c7cd5aea..7e9258bae 100644
+--- a/src/components/entity/ha-statistic-picker.ts
++++ b/src/components/entity/ha-statistic-picker.ts
+@@ -460,6 +460,28 @@ export class HaStatisticPicker extends LitElement {
+     `;
+   };
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("autofocus") || changedProps.has("disabled") || changedProps.has("required") ||
++        changedProps.has("label") || changedProps.has("value") || changedProps.has("helper") ||
++        changedProps.has("placeholder") || changedProps.has("allowCustomEntity") ||
++        changedProps.has("hideClearIcon") || changedProps.has("statisticIds") ||
++        changedProps.has("includeStatisticsUnitOfMeasurement") ||
++        changedProps.has("includeUnitClass") || changedProps.has("includeDeviceClass") ||
++        changedProps.has("entitiesOnly") || changedProps.has("excludeStatistics")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    return (
++      oldHass.localize !== this.hass!.localize ||
++      oldHass.states !== this.hass!.states ||
++      oldHass.entities !== this.hass!.entities ||
++      oldHass.devices !== this.hass!.devices ||
++      oldHass.areas !== this.hass!.areas ||
++      oldHass.floors !== this.hass!.floors ||
++      oldHass.userData !== this.hass!.userData
++    );
++  }
++
+   protected render() {
+     const placeholder =
+       this.placeholder ??
+diff --git a/src/components/entity/state-info.ts b/src/components/entity/state-info.ts
+index 9df328c77..a2aff5851 100644
+--- a/src/components/entity/state-info.ts
++++ b/src/components/entity/state-info.ts
+@@ -1,4 +1,5 @@
+ import type { HassEntity } from "home-assistant-js-websocket";
++import type { PropertyValues } from "lit";
+ import { css, html, LitElement, nothing } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import type { HomeAssistant } from "../../types";
+@@ -16,6 +17,30 @@ class StateInfo extends LitElement {
+
+   @property() public color?: string;
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (
++      changedProps.has("stateObj") ||
++      changedProps.has("inDialog") ||
++      changedProps.has("color")
++    ) {
++      return true;
++    }
++    if (!changedProps.has("hass")) {
++      return false;
++    }
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) {
++      return true;
++    }
++    if (
++      oldHass.localize !== this.hass.localize ||
++      oldHass.formatEntityName !== this.hass.formatEntityName
++    ) {
++      return true;
++    }
++    return false;
++  }
++
+   protected render() {
+     if (!this.hass || !this.stateObj) {
+       return nothing;
+diff --git a/src/components/ha-state-icon.ts b/src/components/ha-state-icon.ts
+index 66fc35cd4..13391a5df 100644
+--- a/src/components/ha-state-icon.ts
++++ b/src/components/ha-state-icon.ts
+@@ -1,4 +1,5 @@
+ import type { HassEntity } from "home-assistant-js-websocket";
++import type { PropertyValues } from "lit";
+ import { html, LitElement, nothing } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import { until } from "lit/directives/until";
+@@ -22,6 +23,37 @@ export class HaStateIcon extends LitElement {
+
+   @property() public icon?: string;
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (
++      changedProps.has("stateObj") ||
++      changedProps.has("stateValue") ||
++      changedProps.has("icon")
++    ) {
++      return true;
++    }
++    if (!changedProps.has("hass")) {
++      return false;
++    }
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) {
++      return true;
++    }
++    if (
++      this.stateObj?.entity_id &&
++      oldHass.entities[this.stateObj.entity_id] !==
++        this.hass?.entities[this.stateObj.entity_id]
++    ) {
++      return true;
++    }
++    if (oldHass.config !== this.hass?.config) {
++      return true;
++    }
++    if (oldHass.connection !== this.hass?.connection) {
++      return true;
++    }
++    return false;
++  }
++
+   protected render() {
+     const overrideIcon =
+       this.icon ||
+diff --git a/src/panels/lovelace/badges/hui-entity-badge.ts b/src/panels/lovelace/badges/hui-entity-badge.ts
+index e7ac83c44..794537220 100644
+--- a/src/panels/lovelace/badges/hui-entity-badge.ts
++++ b/src/panels/lovelace/badges/hui-entity-badge.ts
+@@ -1,5 +1,6 @@
+ import { mdiAlertCircle } from "@mdi/js";
+ import type { HassEntity } from "home-assistant-js-websocket";
++import type { PropertyValues } from "lit";
+ import { css, html, LitElement, nothing } from "lit";
+ import { customElement, property, state } from "lit/decorators";
+ import { classMap } from "lit/directives/class-map";
+@@ -150,6 +151,38 @@ export class HuiEntityBadge extends LitElement implements LovelaceBadge {
+     return imageUrl;
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("_config")) {
++      return true;
++    }
++
++    if (!changedProps.has("hass")) {
++      return false;
++    }
++
++    const oldHass = changedProps.get("hass") as HomeAssistant | undefined;
++    if (!oldHass) {
++      return true;
++    }
++
++    return (
++      oldHass.connected !== this.hass!.connected ||
++      oldHass.themes !== this.hass!.themes ||
++      oldHass.locale !== this.hass!.locale ||
++      oldHass.localize !== this.hass.localize ||
++      oldHass.formatEntityState !== this.hass.formatEntityState ||
++      oldHass.formatEntityAttributeName !==
++        this.hass.formatEntityAttributeName ||
++      oldHass.formatEntityAttributeValue !==
++        this.hass.formatEntityAttributeValue ||
++      oldHass.config.state !== this.hass.config.state ||
++      oldHass.formatEntityName !== this.hass.formatEntityName ||
++      oldHass.hassUrl !== this.hass.hassUrl ||
++      oldHass.states[this._config!.entity] !==
++        this.hass!.states[this._config!.entity]
++    );
++  }
++
+   protected render() {
+     if (!this._config || !this.hass) {
+       return nothing;
+diff --git a/src/panels/lovelace/badges/hui-view-badges.ts b/src/panels/lovelace/badges/hui-view-badges.ts
+index f55e483e8..60190c8a8 100644
+--- a/src/panels/lovelace/badges/hui-view-badges.ts
++++ b/src/panels/lovelace/badges/hui-view-badges.ts
+@@ -12,6 +12,7 @@ import "../../../components/ha-svg-icon";
+ import type { HomeAssistant } from "../../../types";
+ import "../components/hui-badge-edit-mode";
+ import { moveBadge } from "../editor/config-util";
++import { hasConfigChanged } from "../common/has-changed";
+ import type { LovelaceCardPath } from "../editor/lovelace-path";
+ import type { Lovelace } from "../types";
+ import type { HuiBadge } from "./hui-badge";
+@@ -116,6 +117,11 @@ export class HuiViewBadges extends LitElement {
+     fireEvent(this, "ll-create-badge");
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("badges") || changedProps.has("viewIndex") || changedProps.has("showAddLabel") || changedProps.has("_dragging") || changedProps.has("lovelace")) return true;
++    return hasConfigChanged(this, changedProps);
++  }
++
+   render() {
+     if (!this.lovelace) return nothing;
+
+diff --git a/src/panels/lovelace/card-features/hui-alarm-modes-card-feature.ts b/src/panels/lovelace/card-features/hui-alarm-modes-card-feature.ts
+index 2648ae2be..63c20059a 100644
+--- a/src/panels/lovelace/card-features/hui-alarm-modes-card-feature.ts
++++ b/src/panels/lovelace/card-features/hui-alarm-modes-card-feature.ts
+@@ -22,6 +22,7 @@ import {
+ } from "../../../data/alarm_control_panel";
+ import { UNAVAILABLE } from "../../../data/entity/entity";
+ import type { HomeAssistant } from "../../../types";
++import { hasConfigChanged } from "../common/has-changed";
+ import type { LovelaceCardFeature, LovelaceCardFeatureEditor } from "../types";
+ import { cardFeatureStyles } from "./common/card-feature-styles";
+ import { filterModes } from "./common/filter-modes";
+@@ -130,6 +131,17 @@ class HuiAlarmModeCardFeature
+     );
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("_currentMode") || changedProps.has("context")) {
++      return true;
++    }
++    const oldHass = changedProps.get("hass");
++    const entityId = this.context?.entity_id;
++    return hasConfigChanged(this, changedProps) ||
++      (changedProps.has("hass") && (!oldHass || !entityId ||
++        oldHass.states[entityId] !== this.hass!.states[entityId]));
++  }
++
+   protected render(): TemplateResult | typeof nothing {
+     if (
+       !this._config ||
+diff --git a/src/panels/lovelace/card-features/hui-button-card-feature.ts b/src/panels/lovelace/card-features/hui-button-card-feature.ts
+index 8b38d0536..5e6dadf45 100644
+--- a/src/panels/lovelace/card-features/hui-button-card-feature.ts
++++ b/src/panels/lovelace/card-features/hui-button-card-feature.ts
+@@ -1,5 +1,5 @@
+ import type { HassEntity } from "home-assistant-js-websocket";
+-import { html, LitElement, nothing } from "lit";
++import { html, LitElement, nothing, type PropertyValues } from "lit";
+ import { customElement, property, state } from "lit/decorators";
+ import { computeDomain } from "../../../common/entity/compute_domain";
+ import "../../../components/ha-control-button";
+@@ -10,6 +10,7 @@ import {
+ } from "../../../data/script";
+ import { showMoreInfoDialog } from "../../../dialogs/more-info/show-ha-more-info-dialog";
+ import type { HomeAssistant } from "../../../types";
++import { hasConfigChanged } from "../common/has-changed";
+ import type { LovelaceCardFeature, LovelaceCardFeatureEditor } from "../types";
+ import { cardFeatureStyles } from "./common/card-feature-styles";
+ import type {
+@@ -90,6 +91,15 @@ class HuiButtonCardFeature extends LitElement implements LovelaceCardFeature {
+     this._config = config;
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("context")) return true;
++    const oldHass = changedProps.get("hass");
++    const entityId = this.context?.entity_id;
++    return hasConfigChanged(this, changedProps) ||
++      (changedProps.has("hass") && (!oldHass || !entityId ||
++        oldHass.states[entityId] !== this.hass!.states[entityId]));
++  }
++
+   protected render() {
+     if (
+       !this._config ||
+diff --git a/src/panels/lovelace/card-features/hui-cover-open-close-card-feature.ts b/src/panels/lovelace/card-features/hui-cover-open-close-card-feature.ts
+index e462c0652..57182db88 100644
+--- a/src/panels/lovelace/card-features/hui-cover-open-close-card-feature.ts
++++ b/src/panels/lovelace/card-features/hui-cover-open-close-card-feature.ts
+@@ -1,5 +1,5 @@
+ import { mdiStop } from "@mdi/js";
+-import { html, LitElement, nothing } from "lit";
++import { html, LitElement, nothing, type PropertyValues } from "lit";
+ import { customElement, property, state } from "lit/decorators";
+ import { computeDomain } from "../../../common/entity/compute_domain";
+ import {
+@@ -18,6 +18,7 @@ import {
+   type CoverEntity,
+ } from "../../../data/cover";
+ import type { HomeAssistant } from "../../../types";
++import { hasConfigChanged } from "../common/has-changed";
+ import type { LovelaceCardFeature } from "../types";
+ import { cardFeatureStyles } from "./common/card-feature-styles";
+ import type {
+@@ -93,6 +94,15 @@ class HuiCoverOpenCloseCardFeature
+     });
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("context")) return true;
++    const oldHass = changedProps.get("hass");
++    const entityId = this.context?.entity_id;
++    return hasConfigChanged(this, changedProps) ||
++      (changedProps.has("hass") && (!oldHass || !entityId ||
++        oldHass.states[entityId] !== this.hass!.states[entityId]));
++  }
++
+   protected render() {
+     if (
+       !this._config ||
+diff --git a/src/panels/lovelace/card-features/hui-cover-tilt-card-feature.ts b/src/panels/lovelace/card-features/hui-cover-tilt-card-feature.ts
+index 0d18965be..a6e52361a 100644
+--- a/src/panels/lovelace/card-features/hui-cover-tilt-card-feature.ts
++++ b/src/panels/lovelace/card-features/hui-cover-tilt-card-feature.ts
+@@ -1,5 +1,5 @@
+ import { mdiArrowBottomLeft, mdiArrowTopRight, mdiStop } from "@mdi/js";
+-import { LitElement, html, nothing } from "lit";
++import { LitElement, html, nothing, type PropertyValues } from "lit";
+ import { customElement, property, state } from "lit/decorators";
+ import { computeDomain } from "../../../common/entity/compute_domain";
+ import { supportsFeature } from "../../../common/entity/supports-feature";
+@@ -89,6 +89,22 @@ class HuiCoverTiltCardFeature
+     });
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("context")) return true;
++    if (changedProps.has("_config")) return true;
++    if (!changedProps.has("hass")) return false;
++
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++
++    const entityId = this.context?.entity_id;
++
++    if (oldHass.localize !== this.hass!.localize) return true;
++    if (entityId && oldHass.states[entityId] !== this.hass!.states[entityId]) return true;
++
++    return false;
++  }
++
+   protected render() {
+     if (
+       !this._config ||
+diff --git a/src/panels/lovelace/card-features/hui-date-set-card-feature.ts b/src/panels/lovelace/card-features/hui-date-set-card-feature.ts
+index 4f136b0da..70a7be978 100644
+--- a/src/panels/lovelace/card-features/hui-date-set-card-feature.ts
++++ b/src/panels/lovelace/card-features/hui-date-set-card-feature.ts
+@@ -1,4 +1,4 @@
+-import { html, LitElement, nothing } from "lit";
++import { html, LitElement, nothing, type PropertyValues } from "lit";
+ import { customElement, property, state } from "lit/decorators";
+ import { firstWeekdayIndex } from "../../../common/datetime/first_weekday";
+ import {
+@@ -10,6 +10,7 @@ import "../../../components/ha-control-button";
+ import "../../../components/ha-control-button-group";
+ import "../../../components/ha-control-slider";
+ import type { HomeAssistant } from "../../../types";
++import { hasConfigChanged } from "../common/has-changed";
+ import type { LovelaceCardFeature } from "../types";
+ import { cardFeatureStyles } from "./common/card-feature-styles";
+ import type {
+@@ -110,6 +111,15 @@ class HuiDateSetCardFeature extends LitElement implements LovelaceCardFeature {
+     this._config = config;
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("context")) return true;
++    const oldHass = changedProps.get("hass");
++    const entityId = this.context?.entity_id;
++    return hasConfigChanged(this, changedProps) ||
++      (changedProps.has("hass") && entityId &&
++        oldHass && oldHass.states[entityId] !== this.hass!.states[entityId]);
++  }
++
+   protected render() {
+     if (
+       !this._config ||
+diff --git a/src/panels/lovelace/card-features/hui-fan-oscillate-card-feature.ts b/src/panels/lovelace/card-features/hui-fan-oscillate-card-feature.ts
+index beb3503d0..530f08c57 100644
+--- a/src/panels/lovelace/card-features/hui-fan-oscillate-card-feature.ts
++++ b/src/panels/lovelace/card-features/hui-fan-oscillate-card-feature.ts
+@@ -12,6 +12,7 @@ import { UNAVAILABLE } from "../../../data/entity/entity";
+ import type { FanEntity } from "../../../data/fan";
+ import { FanEntityFeature } from "../../../data/fan";
+ import type { HomeAssistant } from "../../../types";
++import { hasConfigChanged } from "../common/has-changed";
+ import type { LovelaceCardFeature } from "../types";
+ import { cardFeatureStyles } from "./common/card-feature-styles";
+ import type {
+@@ -101,6 +102,17 @@ class HuiFanOscillateCardFeature
+     });
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("_oscillate") || changedProps.has("context")) {
++      return true;
++    }
++    const oldHass = changedProps.get("hass");
++    const entityId = this.context?.entity_id;
++    return hasConfigChanged(this, changedProps) ||
++      (changedProps.has("hass") && (!oldHass || !entityId ||
++        oldHass.states[entityId] !== this.hass!.states[entityId]));
++  }
++
+   protected render(): TemplateResult | null {
+     if (
+       !this._config ||
+diff --git a/src/panels/lovelace/card-features/hui-humidifier-toggle-card-feature.ts b/src/panels/lovelace/card-features/hui-humidifier-toggle-card-feature.ts
+index 863ecdfbc..cb87de4b7 100644
+--- a/src/panels/lovelace/card-features/hui-humidifier-toggle-card-feature.ts
++++ b/src/panels/lovelace/card-features/hui-humidifier-toggle-card-feature.ts
+@@ -13,6 +13,7 @@ import type {
+   HumidifierState,
+ } from "../../../data/humidifier";
+ import type { HomeAssistant } from "../../../types";
++import { hasConfigChanged } from "../common/has-changed";
+ import type { LovelaceCardFeature } from "../types";
+ import { cardFeatureStyles } from "./common/card-feature-styles";
+ import type {
+@@ -106,6 +107,17 @@ class HuiHumidifierToggleCardFeature
+     );
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("_currentState") || changedProps.has("context")) {
++      return true;
++    }
++    const oldHass = changedProps.get("hass");
++    const entityId = this.context?.entity_id;
++    return hasConfigChanged(this, changedProps) ||
++      (changedProps.has("hass") && (!oldHass || !entityId ||
++        oldHass.states[entityId] !== this.hass!.states[entityId]));
++  }
++
+   protected render(): TemplateResult | null {
+     if (
+       !this._config ||
+diff --git a/src/panels/lovelace/card-features/hui-light-brightness-card-feature.ts b/src/panels/lovelace/card-features/hui-light-brightness-card-feature.ts
+index fb933b4e3..6f3d1a3ae 100644
+--- a/src/panels/lovelace/card-features/hui-light-brightness-card-feature.ts
++++ b/src/panels/lovelace/card-features/hui-light-brightness-card-feature.ts
+@@ -1,4 +1,4 @@
+-import { html, LitElement, nothing } from "lit";
++import { html, LitElement, nothing, type PropertyValues } from "lit";
+ import { customElement, property, state } from "lit/decorators";
+ import { computeDomain } from "../../../common/entity/compute_domain";
+ import { stateActive } from "../../../common/entity/state_active";
+@@ -56,6 +56,17 @@ class HuiLightBrightnessCardFeature
+     this._config = config;
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("_config") || changedProps.has("context")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    const entityId = this.context?.entity_id;
++    if (!oldHass || !entityId) return true;
++    return oldHass.states[entityId] !== this.hass!.states[entityId] ||
++      oldHass.locale !== this.hass!.locale ||
++      oldHass.localize !== this.hass!.localize;
++  }
++
+   protected render() {
+     if (
+       !this._config ||
+diff --git a/src/panels/lovelace/card-features/hui-light-color-temp-card-feature.ts b/src/panels/lovelace/card-features/hui-light-color-temp-card-feature.ts
+index 83f9c7a77..1a555b4b5 100644
+--- a/src/panels/lovelace/card-features/hui-light-color-temp-card-feature.ts
++++ b/src/panels/lovelace/card-features/hui-light-color-temp-card-feature.ts
+@@ -1,4 +1,4 @@
+-import { css, html, LitElement, nothing } from "lit";
++import { css, html, LitElement, nothing, type PropertyValues } from "lit";
+ import { customElement, property, state } from "lit/decorators";
+ import { styleMap } from "lit/directives/style-map";
+ import memoizeOne from "memoize-one";
+@@ -18,6 +18,7 @@ import {
+ } from "../../../data/light";
+ import { generateColorTemperatureGradient } from "../../../dialogs/more-info/components/lights/light-color-temp-picker";
+ import type { HomeAssistant } from "../../../types";
++import { hasConfigChanged } from "../common/has-changed";
+ import type { LovelaceCardFeature } from "../types";
+ import { cardFeatureStyles } from "./common/card-feature-styles";
+ import type {
+@@ -71,6 +72,15 @@ class HuiLightColorTempCardFeature
+     this._config = config;
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("context")) return true;
++    const oldHass = changedProps.get("hass");
++    const entityId = this.context?.entity_id;
++    return hasConfigChanged(this, changedProps) ||
++      (changedProps.has("hass") && (!oldHass || !entityId ||
++        oldHass.states[entityId] !== this.hass!.states[entityId]));
++  }
++
+   protected render() {
+     if (
+       !this._config ||
+diff --git a/src/panels/lovelace/card-features/hui-lock-commands-card-feature.ts b/src/panels/lovelace/card-features/hui-lock-commands-card-feature.ts
+index 1ea134c55..f29c93ea0 100644
+--- a/src/panels/lovelace/card-features/hui-lock-commands-card-feature.ts
++++ b/src/panels/lovelace/card-features/hui-lock-commands-card-feature.ts
+@@ -1,5 +1,5 @@
+ import { mdiLock, mdiLockOpenVariant } from "@mdi/js";
+-import type { CSSResultGroup } from "lit";
++import type { CSSResultGroup, PropertyValues } from "lit";
+ import { LitElement, html, nothing } from "lit";
+ import { customElement, property, state } from "lit/decorators";
+ import { computeDomain } from "../../../common/entity/compute_domain";
+@@ -13,6 +13,7 @@ import {
+   type LockEntity,
+ } from "../../../data/lock";
+ import type { HomeAssistant } from "../../../types";
++import { hasConfigChanged } from "../common/has-changed";
+ import type { LovelaceCardFeature } from "../types";
+ import { cardFeatureStyles } from "./common/card-feature-styles";
+ import type {
+@@ -73,6 +74,15 @@ class HuiLockCommandsCardFeature
+     callProtectedLockService(this, this.hass, this._stateObj, service);
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("context")) return true;
++    const oldHass = changedProps.get("hass");
++    const entityId = this.context?.entity_id;
++    return hasConfigChanged(this, changedProps) ||
++      (changedProps.has("hass") && (!oldHass || !entityId ||
++        oldHass.states[entityId] !== this.hass!.states[entityId]));
++  }
++
+   protected render() {
+     if (
+       !this._config ||
+diff --git a/src/panels/lovelace/card-features/hui-lock-open-door-card-feature.ts b/src/panels/lovelace/card-features/hui-lock-open-door-card-feature.ts
+index 1fc029c17..3f618afbc 100644
+--- a/src/panels/lovelace/card-features/hui-lock-open-door-card-feature.ts
++++ b/src/panels/lovelace/card-features/hui-lock-open-door-card-feature.ts
+@@ -1,5 +1,5 @@
+ import { mdiCheck } from "@mdi/js";
+-import type { CSSResultGroup } from "lit";
++import type { CSSResultGroup, PropertyValues } from "lit";
+ import { css, html, LitElement, nothing } from "lit";
+ import { customElement, property, state } from "lit/decorators";
+ import { computeDomain } from "../../../common/entity/compute_domain";
+@@ -13,6 +13,7 @@ import {
+   type LockEntity,
+ } from "../../../data/lock";
+ import type { HomeAssistant } from "../../../types";
++import { hasConfigChanged } from "../common/has-changed";
+ import type { LovelaceCardFeature } from "../types";
+ import { cardFeatureStyles } from "./common/card-feature-styles";
+ import type {
+@@ -95,6 +96,15 @@ class HuiLockOpenDoorCardFeature
+     this._setButtonState("done", DONE_TIMEOUT_SECOND);
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("context") || changedProps.has("_buttonState")) return true;
++    const oldHass = changedProps.get("hass");
++    const entityId = this.context?.entity_id;
++    return hasConfigChanged(this, changedProps) ||
++      (changedProps.has("hass") && (!oldHass || !entityId ||
++        oldHass.states[entityId] !== this.hass!.states[entityId]));
++  }
++
+   protected render() {
+     if (
+       !this._config ||
+diff --git a/src/panels/lovelace/card-features/hui-media-player-volume-buttons-card-feature.ts b/src/panels/lovelace/card-features/hui-media-player-volume-buttons-card-feature.ts
+index 6f5bcae0e..e0c751cc4 100644
+--- a/src/panels/lovelace/card-features/hui-media-player-volume-buttons-card-feature.ts
++++ b/src/panels/lovelace/card-features/hui-media-player-volume-buttons-card-feature.ts
+@@ -1,4 +1,4 @@
+-import { html, LitElement, nothing } from "lit";
++import { html, LitElement, nothing, type PropertyValues } from "lit";
+ import { customElement, property, state } from "lit/decorators";
+ import { computeDomain } from "../../../common/entity/compute_domain";
+ import { supportsFeature } from "../../../common/entity/supports-feature";
+@@ -10,6 +10,7 @@ import {
+   type MediaPlayerEntity,
+ } from "../../../data/media-player";
+ import type { HomeAssistant } from "../../../types";
++import { hasConfigChanged } from "../common/has-changed";
+ import type { LovelaceCardFeature, LovelaceCardFeatureEditor } from "../types";
+ import { cardFeatureStyles } from "./common/card-feature-styles";
+ import type {
+@@ -73,6 +74,15 @@ class HuiMediaPlayerVolumeButtonsCardFeature
+     this._config = config;
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("context")) return true;
++    const oldHass = changedProps.get("hass");
++    const entityId = this.context?.entity_id;
++    return hasConfigChanged(this, changedProps) ||
++      (changedProps.has("hass") && (!oldHass || !entityId ||
++        oldHass.states[entityId] !== this.hass!.states[entityId]));
++  }
++
+   protected render() {
+     if (
+       !this._config ||
+diff --git a/src/panels/lovelace/card-features/hui-media-player-volume-slider-card-feature.ts b/src/panels/lovelace/card-features/hui-media-player-volume-slider-card-feature.ts
+index 6e8c08ada..d654025e7 100644
+--- a/src/panels/lovelace/card-features/hui-media-player-volume-slider-card-feature.ts
++++ b/src/panels/lovelace/card-features/hui-media-player-volume-slider-card-feature.ts
+@@ -1,4 +1,4 @@
+-import { html, LitElement, nothing } from "lit";
++import { html, LitElement, nothing, type PropertyValues } from "lit";
+ import { customElement, property, state } from "lit/decorators";
+ import { computeDomain } from "../../../common/entity/compute_domain";
+ import { stateActive } from "../../../common/entity/state_active";
+@@ -10,6 +10,7 @@ import {
+   type MediaPlayerEntity,
+ } from "../../../data/media-player";
+ import type { HomeAssistant } from "../../../types";
++import { hasConfigChanged } from "../common/has-changed";
+ import type { LovelaceCardFeature } from "../types";
+ import { cardFeatureStyles } from "./common/card-feature-styles";
+ import type {
+@@ -65,6 +66,15 @@ class HuiMediaPlayerVolumeSliderCardFeature
+     this._config = config;
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("context")) return true;
++    const oldHass = changedProps.get("hass");
++    const entityId = this.context?.entity_id;
++    return hasConfigChanged(this, changedProps) ||
++      (changedProps.has("hass") && (!oldHass || !entityId ||
++        oldHass.states[entityId] !== this.hass!.states[entityId]));
++  }
++
+   protected render() {
+     if (
+       !this._config ||
+diff --git a/src/panels/lovelace/card-features/hui-numeric-favorite-card-feature-base.ts b/src/panels/lovelace/card-features/hui-numeric-favorite-card-feature-base.ts
+index 598cf74e7..fb597f6a9 100644
+--- a/src/panels/lovelace/card-features/hui-numeric-favorite-card-feature-base.ts
++++ b/src/panels/lovelace/card-features/hui-numeric-favorite-card-feature-base.ts
+@@ -16,6 +16,7 @@ import {
+   subscribeEntityRegistry,
+ } from "../../../data/entity/entity_registry";
+ import type { HomeAssistant } from "../../../types";
++import { hasConfigChanged } from "../common/has-changed";
+ import type { LovelaceCardFeature } from "../types";
+ import { cardFeatureStyles } from "./common/card-feature-styles";
+ import type {
+@@ -275,6 +276,22 @@ export abstract class HuiNumericFavoriteCardFeatureBase<
+     }
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (
++      changedProps.has("context") ||
++      changedProps.has("color") ||
++      changedProps.has("_entry") ||
++      changedProps.has("_currentPosition")
++    ) {
++      return true;
++    }
++    const oldHass = changedProps.get("hass");
++    const entityId = this.context?.entity_id;
++    return hasConfigChanged(this, changedProps) ||
++      (changedProps.has("hass") && (!oldHass || !entityId ||
++        oldHass.states[entityId] !== this.hass!.states[entityId]));
++  }
++
+   protected render(): TemplateResult | null {
+     if (
+       !this._config ||
+diff --git a/src/panels/lovelace/card-features/hui-numeric-input-card-feature.ts b/src/panels/lovelace/card-features/hui-numeric-input-card-feature.ts
+index 0edd12757..3c2d46c7a 100644
+--- a/src/panels/lovelace/card-features/hui-numeric-input-card-feature.ts
++++ b/src/panels/lovelace/card-features/hui-numeric-input-card-feature.ts
+@@ -10,6 +10,7 @@ import "../../../components/ha-control-slider";
+ import "../../../components/ha-icon";
+ import { isUnavailableState } from "../../../data/entity/entity";
+ import type { HomeAssistant } from "../../../types";
++import { hasConfigChanged } from "../common/has-changed";
+ import type { LovelaceCardFeature, LovelaceCardFeatureEditor } from "../types";
+ import { cardFeatureStyles } from "./common/card-feature-styles";
+ import type {
+@@ -93,6 +94,15 @@ class HuiNumericInputCardFeature
+     });
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("context")) return true;
++    const oldHass = changedProps.get("hass");
++    const entityId = this.context?.entity_id;
++    return hasConfigChanged(this, changedProps) ||
++      (changedProps.has("hass") && (!oldHass || !entityId ||
++        oldHass.states[entityId] !== this.hass!.states[entityId]));
++  }
++
+   protected render() {
+     if (
+       !this._config ||
+diff --git a/src/panels/lovelace/card-features/hui-target-humidity-card-feature.ts b/src/panels/lovelace/card-features/hui-target-humidity-card-feature.ts
+index b5b5c9d52..aad51c2b5 100644
+--- a/src/panels/lovelace/card-features/hui-target-humidity-card-feature.ts
++++ b/src/panels/lovelace/card-features/hui-target-humidity-card-feature.ts
+@@ -6,6 +6,7 @@ import "../../../components/ha-control-slider";
+ import { UNAVAILABLE } from "../../../data/entity/entity";
+ import type { HumidifierEntity } from "../../../data/humidifier";
+ import type { HomeAssistant } from "../../../types";
++import { hasConfigChanged } from "../common/has-changed";
+ import type { LovelaceCardFeature } from "../types";
+ import { cardFeatureStyles } from "./common/card-feature-styles";
+ import type {
+@@ -98,6 +99,15 @@ class HuiTargetHumidityCardFeature
+     });
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("context")) return true;
++    const oldHass = changedProps.get("hass");
++    const entityId = this.context?.entity_id;
++    return hasConfigChanged(this, changedProps) ||
++      (changedProps.has("hass") && (!oldHass || !entityId ||
++        oldHass.states[entityId] !== this.hass!.states[entityId]));
++  }
++
+   protected render() {
+     if (
+       !this._config ||
+diff --git a/src/panels/lovelace/card-features/hui-toggle-card-feature.ts b/src/panels/lovelace/card-features/hui-toggle-card-feature.ts
+index cf4054587..833dc041b 100644
+--- a/src/panels/lovelace/card-features/hui-toggle-card-feature.ts
++++ b/src/panels/lovelace/card-features/hui-toggle-card-feature.ts
+@@ -9,7 +9,7 @@ import {
+   mdiVolumeOff,
+ } from "@mdi/js";
+ import type { HassEntity } from "home-assistant-js-websocket";
+-import { LitElement, css, html, nothing } from "lit";
++import { LitElement, css, html, nothing, type PropertyValues } from "lit";
+ import { customElement, property, state } from "lit/decorators";
+ import { classMap } from "lit/directives/class-map";
+ import { styleMap } from "lit/directives/style-map";
+@@ -21,6 +21,7 @@ import "../../../components/ha-control-switch";
+ import { UNAVAILABLE, UNKNOWN } from "../../../data/entity/entity";
+ import { forwardHaptic } from "../../../data/haptics";
+ import type { HomeAssistant } from "../../../types";
++import { hasConfigChanged } from "../common/has-changed";
+ import type { LovelaceCardFeature } from "../types";
+ import { cardFeatureStyles } from "./common/card-feature-styles";
+ import type {
+@@ -122,6 +123,15 @@ class HuiToggleCardFeature extends LitElement implements LovelaceCardFeature {
+     });
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("context")) return true;
++    const oldHass = changedProps.get("hass");
++    const entityId = this.context?.entity_id;
++    return hasConfigChanged(this, changedProps) ||
++      (changedProps.has("hass") && (!oldHass || !entityId ||
++        oldHass.states[entityId] !== this.hass!.states[entityId]));
++  }
++
+   protected render() {
+     if (
+       !this._config ||
+diff --git a/src/panels/lovelace/card-features/hui-update-actions-card-feature.ts b/src/panels/lovelace/card-features/hui-update-actions-card-feature.ts
+index e6f211109..9f6428e6f 100644
+--- a/src/panels/lovelace/card-features/hui-update-actions-card-feature.ts
++++ b/src/panels/lovelace/card-features/hui-update-actions-card-feature.ts
+@@ -1,5 +1,5 @@
+ import { mdiCancel, mdiCellphoneArrowDown } from "@mdi/js";
+-import { LitElement, html, nothing } from "lit";
++import { LitElement, html, nothing, type PropertyValues } from "lit";
+ import { customElement, property, state } from "lit/decorators";
+ import { computeDomain } from "../../../common/entity/compute_domain";
+ import { stateActive } from "../../../common/entity/state_active";
+@@ -11,6 +11,7 @@ import type { UpdateEntity } from "../../../data/update";
+ import { UpdateEntityFeature, updateIsInstalling } from "../../../data/update";
+ import { showUpdateBackupDialogParams } from "../../../dialogs/update_backup/show-update-backup-dialog";
+ import type { HomeAssistant } from "../../../types";
++import { hasConfigChanged } from "../common/has-changed";
+ import type { LovelaceCardFeature, LovelaceCardFeatureEditor } from "../types";
+ import { cardFeatureStyles } from "./common/card-feature-styles";
+ import type {
+@@ -128,6 +129,15 @@ class HuiUpdateActionsCardFeature
+     });
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("context")) return true;
++    const oldHass = changedProps.get("hass");
++    const entityId = this.context?.entity_id;
++    return hasConfigChanged(this, changedProps) ||
++      (changedProps.has("hass") && (!oldHass || !entityId ||
++        oldHass.states[entityId] !== this.hass!.states[entityId]));
++  }
++
+   protected render() {
+     if (
+       !this._config ||
+diff --git a/src/panels/lovelace/card-features/hui-valve-open-close-card-feature.ts b/src/panels/lovelace/card-features/hui-valve-open-close-card-feature.ts
+index 9034a0eee..e8e4f4970 100644
+--- a/src/panels/lovelace/card-features/hui-valve-open-close-card-feature.ts
++++ b/src/panels/lovelace/card-features/hui-valve-open-close-card-feature.ts
+@@ -1,5 +1,5 @@
+ import { mdiStop, mdiValveClosed, mdiValveOpen } from "@mdi/js";
+-import { css, html, LitElement, nothing } from "lit";
++import { css, html, LitElement, nothing, type PropertyValues } from "lit";
+ import { customElement, property, state } from "lit/decorators";
+ import { classMap } from "lit/directives/class-map";
+ import { styleMap } from "lit/directives/style-map";
+@@ -19,6 +19,7 @@ import {
+   type ValveEntity,
+ } from "../../../data/valve";
+ import type { HomeAssistant } from "../../../types";
++import { hasConfigChanged } from "../common/has-changed";
+ import type { LovelaceCardFeature } from "../types";
+ import { cardFeatureStyles } from "./common/card-feature-styles";
+ import type {
+@@ -113,6 +114,15 @@ class HuiValveOpenCloseCardFeature
+     }
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("context")) return true;
++    const oldHass = changedProps.get("hass");
++    const entityId = this.context?.entity_id;
++    return hasConfigChanged(this, changedProps) ||
++      (changedProps.has("hass") && (!oldHass || !entityId ||
++        oldHass.states[entityId] !== this.hass!.states[entityId]));
++  }
++
+   protected render() {
+     if (
+       !this._config ||
+diff --git a/src/panels/lovelace/cards/hui-discovered-devices-card.ts b/src/panels/lovelace/cards/hui-discovered-devices-card.ts
+index 1d7129aee..2399c975d 100644
+--- a/src/panels/lovelace/cards/hui-discovered-devices-card.ts
++++ b/src/panels/lovelace/cards/hui-discovered-devices-card.ts
+@@ -20,6 +20,7 @@ import { showAddIntegrationDialog } from "../../config/integrations/show-add-int
+ import type { HomeAssistant } from "../../../types";
+ import { handleAction } from "../common/handle-action";
+ import { hasAction } from "../common/has-action";
++import { hasConfigChanged } from "../common/has-changed";
+ import type { LovelaceCard, LovelaceGridOptions } from "../types";
+ import { tileCardStyle } from "./tile/tile-card-style";
+ import type { DiscoveredDevicesCardConfig } from "./types";
+@@ -156,6 +157,12 @@ export class HuiDiscoveredDevicesCard
+     }
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    return (
++      hasConfigChanged(this, changedProps) || changedProps.has("_discoveredFlows")
++    );
++  }
++
+   protected render(): TemplateResult | typeof nothing {
+     if (!this._config || !this.hass || this.hidden) {
+       return nothing;
+diff --git a/src/panels/lovelace/cards/hui-distribution-card.ts b/src/panels/lovelace/cards/hui-distribution-card.ts
+index 0fd3cc5a3..0dccd3786 100644
+--- a/src/panels/lovelace/cards/hui-distribution-card.ts
++++ b/src/panels/lovelace/cards/hui-distribution-card.ts
+@@ -1,6 +1,6 @@
+ import { mdiChartBox, mdiChevronDown, mdiChevronUp } from "@mdi/js";
+ import type { HassEntity } from "home-assistant-js-websocket";
+-import { css, html, LitElement, nothing, type TemplateResult } from "lit";
++import { css, html, LitElement, nothing, type PropertyValues, type TemplateResult } from "lit";
+ import { customElement, property, state } from "lit/decorators";
+ import { classMap } from "lit/directives/class-map";
+ import { styleMap } from "lit/directives/style-map";
+@@ -21,6 +21,7 @@ import type { HomeAssistant } from "../../../types";
+ import { createEntityNotFoundWarning } from "../components/hui-warning";
+ import { processConfigEntities } from "../common/process-config-entities";
+ import { findEntities } from "../common/find-entities";
++import { hasConfigOrEntitiesChanged } from "../common/has-changed";
+ import type {
+   LovelaceCard,
+   LovelaceCardEditor,
+@@ -405,6 +406,14 @@ export class HuiDistributionCard
+     `;
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    return (
++      hasConfigOrEntitiesChanged(this, changedProps) ||
++      changedProps.size > 1 ||
++      !changedProps.has("hass")
++    );
++  }
++
+   protected render(): TemplateResult | typeof nothing {
+     if (!this._config || !this.hass) {
+       return nothing;
+diff --git a/src/panels/lovelace/cards/hui-home-summary-card.ts b/src/panels/lovelace/cards/hui-home-summary-card.ts
+index 66e9037b5..50c11e85b 100644
+--- a/src/panels/lovelace/cards/hui-home-summary-card.ts
++++ b/src/panels/lovelace/cards/hui-home-summary-card.ts
+@@ -1,6 +1,6 @@
+ import { endOfDay, startOfDay } from "date-fns";
+ import type { UnsubscribeFunc } from "home-assistant-js-websocket";
+-import { css, html, LitElement, nothing } from "lit";
++import { css, html, LitElement, nothing, type PropertyValues } from "lit";
+ import { customElement, property, state } from "lit/decorators";
+ import { styleMap } from "lit/directives/style-map";
+ import memoizeOne from "memoize-one";
+@@ -28,6 +28,7 @@ import { SubscribeMixin } from "../../../mixins/subscribe-mixin";
+ import type { HomeAssistant } from "../../../types";
+ import { handleAction } from "../common/handle-action";
+ import { hasAction } from "../common/has-action";
++import { hasConfigChanged } from "../common/has-changed";
+ import {
+   getSummaryLabel,
+   HOME_SUMMARIES_COLORS,
+@@ -333,6 +334,18 @@ export class HuiHomeSummaryCard
+     return "";
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("_energyData")) return true;
++    if (hasConfigChanged(this, changedProps)) return true;
++
++    const oldHass = changedProps.get("hass");
++    if (oldHass && oldHass.states !== this.hass!.states) {
++      return true;
++    }
++
++    return false;
++  }
++
+   protected render() {
+     if (!this._config || !this.hass) {
+       return nothing;
+diff --git a/src/panels/lovelace/cards/hui-humidifier-card.ts b/src/panels/lovelace/cards/hui-humidifier-card.ts
+index 448ef7627..f2a03d8c2 100644
+--- a/src/panels/lovelace/cards/hui-humidifier-card.ts
++++ b/src/panels/lovelace/cards/hui-humidifier-card.ts
+@@ -15,6 +15,7 @@ import type { HomeAssistant } from "../../../types";
+ import "../card-features/hui-card-features";
+ import type { LovelaceCardFeatureContext } from "../card-features/types";
+ import { findEntities } from "../common/find-entities";
++import { hasConfigOrEntityChanged } from "../common/has-changed";
+ import { createEntityNotFoundWarning } from "../components/hui-warning";
+ import type {
+   LovelaceCard,
+@@ -118,6 +119,11 @@ export class HuiHumidifierCard extends LitElement implements LovelaceCard {
+     }
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("_featureContext")) return true;
++    return hasConfigOrEntityChanged(this, changedProps);
++  }
++
+   protected render() {
+     if (!this.hass || !this._config) {
+       return nothing;
+diff --git a/src/panels/lovelace/cards/hui-picture-elements-card.ts b/src/panels/lovelace/cards/hui-picture-elements-card.ts
+index f63b1e587..20a9b68b3 100644
+--- a/src/panels/lovelace/cards/hui-picture-elements-card.ts
++++ b/src/panels/lovelace/cards/hui-picture-elements-card.ts
+@@ -8,6 +8,7 @@ import type { ImageEntity } from "../../../data/image";
+ import { computeImageUrl } from "../../../data/image";
+ import type { HomeAssistant } from "../../../types";
+ import { findEntities } from "../common/find-entities";
++import { hasConfigOrEntityChanged } from "../common/has-changed";
+ import type { LovelaceElement, LovelaceElementConfig } from "../elements/types";
+ import type { LovelaceCard, LovelaceCardEditor } from "../types";
+ import { createStyledHuiElement } from "./picture-elements/create-styled-hui-element";
+@@ -124,6 +125,20 @@ class HuiPictureElementsCard extends LitElement implements LovelaceCard {
+     }
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("_elements")) return true;
++    if (hasConfigOrEntityChanged(this, changedProps)) return true;
++
++    if (changedProps.has("hass") && this._config?.image_entity) {
++      const oldHass = changedProps.get("hass") as HomeAssistant | undefined;
++      if (oldHass && oldHass.states[this._config.image_entity] !== this.hass!.states[this._config.image_entity]) {
++        return true;
++      }
++    }
++
++    return false;
++  }
++
+   protected render() {
+     if (!this.hass || !this._config) {
+       return nothing;
+diff --git a/src/panels/lovelace/cards/hui-repairs-card.ts b/src/panels/lovelace/cards/hui-repairs-card.ts
+index a5ef19716..e4b0cc550 100644
+--- a/src/panels/lovelace/cards/hui-repairs-card.ts
++++ b/src/panels/lovelace/cards/hui-repairs-card.ts
+@@ -16,6 +16,7 @@ import { SubscribeMixin } from "../../../mixins/subscribe-mixin";
+ import type { HomeAssistant } from "../../../types";
+ import { handleAction } from "../common/handle-action";
+ import { hasAction } from "../common/has-action";
++import { hasConfigChanged } from "../common/has-changed";
+ import type { LovelaceCard, LovelaceGridOptions } from "../types";
+ import { tileCardStyle } from "./tile/tile-card-style";
+ import type { RepairsCardConfig } from "./types";
+@@ -111,6 +112,11 @@ export class HuiRepairsCard
+     }
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("_repairsIssues")) return true;
++    return hasConfigChanged(this, changedProps);
++  }
++
+   protected render(): TemplateResult | typeof nothing {
+     if (!this._config || !this.hass || this.hidden) {
+       return nothing;
+diff --git a/src/panels/lovelace/cards/hui-starting-card.ts b/src/panels/lovelace/cards/hui-starting-card.ts
+index 9fc36c778..f79bc698a 100644
+--- a/src/panels/lovelace/cards/hui-starting-card.ts
++++ b/src/panels/lovelace/cards/hui-starting-card.ts
+@@ -7,6 +7,7 @@ import "../../../components/ha-card";
+ import "../../../components/ha-spinner";
+ import type { LovelaceCardConfig } from "../../../data/lovelace/config/card";
+ import type { HomeAssistant } from "../../../types";
++import { hasConfigChanged } from "../common/has-changed";
+ import type { LovelaceCard } from "../types";
+
+ @customElement("hui-starting-card")
+@@ -31,6 +32,10 @@ export class HuiStartingCard extends LitElement implements LovelaceCard {
+     }
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    return hasConfigChanged(this, changedProps);
++  }
++
+   protected render() {
+     if (!this.hass) {
+       return nothing;
+diff --git a/src/panels/lovelace/cards/hui-thermostat-card.ts b/src/panels/lovelace/cards/hui-thermostat-card.ts
+index 772ee3935..b75da611e 100644
+--- a/src/panels/lovelace/cards/hui-thermostat-card.ts
++++ b/src/panels/lovelace/cards/hui-thermostat-card.ts
+@@ -16,6 +16,7 @@ import type { HomeAssistant } from "../../../types";
+ import "../card-features/hui-card-features";
+ import type { LovelaceCardFeatureContext } from "../card-features/types";
+ import { findEntities } from "../common/find-entities";
++import { hasConfigOrEntityChanged } from "../common/has-changed";
+ import { createEntityNotFoundWarning } from "../components/hui-warning";
+ import type {
+   LovelaceCard,
+@@ -116,6 +117,11 @@ export class HuiThermostatCard extends LitElement implements LovelaceCard {
+     }
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("_featureContext") || changedProps.has("_resizeController")) return true;
++    return hasConfigOrEntityChanged(this, changedProps);
++  }
++
+   protected render() {
+     if (!this.hass || !this._config) {
+       return nothing;
+diff --git a/src/panels/lovelace/cards/hui-tile-card.ts b/src/panels/lovelace/cards/hui-tile-card.ts
+index 883b0e860..f8d2125d1 100644
+--- a/src/panels/lovelace/cards/hui-tile-card.ts
++++ b/src/panels/lovelace/cards/hui-tile-card.ts
+@@ -1,4 +1,5 @@
+ import type { HassEntity } from "home-assistant-js-websocket";
++import type { PropertyValues } from "lit";
+ import { css, html, LitElement, nothing } from "lit";
+ import { customElement, property, state } from "lit/decorators";
+ import { classMap } from "lit/directives/class-map";
+@@ -26,6 +27,7 @@ import type { LovelaceCardFeatureContext } from "../card-features/types";
+ import { findEntities } from "../common/find-entities";
+ import { handleAction } from "../common/handle-action";
+ import { hasAction } from "../common/has-action";
++import { hasConfigOrEntityChanged } from "../common/has-changed";
+ import { createEntityNotFoundWarning } from "../components/hui-warning";
+ import type {
+   LovelaceCard,
+@@ -236,6 +238,11 @@ export class HuiTileCard extends LitElement implements LovelaceCard {
+     return features;
+   });
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("_featureContext")) return true;
++    return hasConfigOrEntityChanged(this, changedProps);
++  }
++
+   protected render() {
+     if (!this._config || !this.hass) {
+       return nothing;
+diff --git a/src/panels/lovelace/cards/hui-updates-card.ts b/src/panels/lovelace/cards/hui-updates-card.ts
+index a478bb7ca..2be6dabd6 100644
+--- a/src/panels/lovelace/cards/hui-updates-card.ts
++++ b/src/panels/lovelace/cards/hui-updates-card.ts
+@@ -17,6 +17,7 @@ import {
+ import type { HomeAssistant } from "../../../types";
+ import { handleAction } from "../common/handle-action";
+ import { hasAction } from "../common/has-action";
++import { hasConfigChanged } from "../common/has-changed";
+ import type { LovelaceCard, LovelaceGridOptions } from "../types";
+ import { tileCardStyle } from "./tile/tile-card-style";
+ import type { UpdatesCardConfig } from "./types";
+@@ -103,6 +104,19 @@ export class HuiUpdatesCard extends LitElement implements LovelaceCard {
+     }
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (hasConfigChanged(this, changedProps)) {
++      return true;
++    }
++
++    if (!changedProps.has("hass")) {
++      return false;
++    }
++
++    const oldHass = changedProps.get("hass") as HomeAssistant | undefined;
++    return oldHass?.states !== this.hass?.states;
++  }
++
+   protected render(): TemplateResult | typeof nothing {
+     if (!this._config || !this.hass) {
+       return nothing;
+diff --git a/src/panels/lovelace/components/hui-badge-edit-mode.ts b/src/panels/lovelace/components/hui-badge-edit-mode.ts
+index d89120244..ff19c06fe 100644
+--- a/src/panels/lovelace/components/hui-badge-edit-mode.ts
++++ b/src/panels/lovelace/components/hui-badge-edit-mode.ts
+@@ -8,7 +8,7 @@ import {
+   mdiPlusCircleMultipleOutline,
+ } from "@mdi/js";
+ import deepClone from "deep-clone-simple";
+-import type { CSSResultGroup, TemplateResult } from "lit";
++import type { CSSResultGroup, PropertyValues, TemplateResult } from "lit";
+ import { LitElement, css, html } from "lit";
+ import { customElement, property, state } from "lit/decorators";
+ import { classMap } from "lit/directives/class-map";
+@@ -23,6 +23,7 @@ import {
+   ensureBadgeConfig,
+   type LovelaceBadgeConfig,
+ } from "../../../data/lovelace/config/badge";
++import { hasConfigChanged } from "../common/has-changed";
+ import { haStyle } from "../../../resources/styles";
+ import type { HomeAssistant } from "../../../types";
+ import { showEditBadgeDialog } from "../editor/badge-editor/show-edit-badge-dialog";
+@@ -107,6 +108,13 @@ export class HuiBadgeEditMode extends LitElement {
+     document.removeEventListener("click", this._documentClicked);
+   };
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    const oldLovelace = changedProps.get("lovelace");
++    if (oldLovelace && oldLovelace.hass !== this.lovelace.hass) return true;
++    if (hasConfigChanged(this, changedProps)) return true;
++    return changedProps.size > 0;
++  }
++
+   protected render(): TemplateResult {
+     const showOverlay =
+       (this._hover || this._menuOpened || this._focused) && !this.hiddenOverlay;
+diff --git a/src/panels/lovelace/components/hui-card-edit-mode.ts b/src/panels/lovelace/components/hui-card-edit-mode.ts
+index 93227f503..ac24754df 100644
+--- a/src/panels/lovelace/components/hui-card-edit-mode.ts
++++ b/src/panels/lovelace/components/hui-card-edit-mode.ts
+@@ -8,7 +8,7 @@ import {
+   mdiPencil,
+   mdiPlusCircleMultipleOutline,
+ } from "@mdi/js";
+-import type { CSSResultGroup, TemplateResult } from "lit";
++import type { CSSResultGroup, PropertyValues, TemplateResult } from "lit";
+ import { LitElement, css, html, nothing } from "lit";
+ import { customElement, property, state } from "lit/decorators";
+ import { classMap } from "lit/directives/class-map";
+@@ -20,6 +20,7 @@ import "../../../components/ha-icon-button";
+ import "../../../components/ha-svg-icon";
+ import { haStyle } from "../../../resources/styles";
+ import type { HomeAssistant } from "../../../types";
++import { hasConfigChanged } from "../common/has-changed";
+ import type { LovelaceCardPath } from "../editor/lovelace-path";
+ import type { Lovelace } from "../types";
+
+@@ -92,6 +93,20 @@ export class HuiCardEditMode extends LitElement {
+     document.removeEventListener("click", this._documentClicked);
+   };
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    const oldLovelace = changedProps.get("lovelace");
++    if (oldLovelace && oldLovelace.hass !== this.lovelace.hass) return true;
++    if (hasConfigChanged(this, changedProps)) return true;
++    return (
++      changedProps.has("_hover") ||
++      changedProps.has("_focused") ||
++      changedProps.has("hiddenOverlay") ||
++      changedProps.has("noEdit") ||
++      changedProps.has("noDuplicate") ||
++      changedProps.has("noMove")
++    );
++  }
++
+   protected render(): TemplateResult {
+     const showOverlay = (this._hover || this._focused) && !this.hiddenOverlay;
+
+diff --git a/src/panels/lovelace/components/hui-generic-entity-row.ts b/src/panels/lovelace/components/hui-generic-entity-row.ts
+index 9b6f9008a..053daabcb 100644
+--- a/src/panels/lovelace/components/hui-generic-entity-row.ts
++++ b/src/panels/lovelace/components/hui-generic-entity-row.ts
+@@ -42,6 +42,56 @@ export class HuiGenericEntityRow extends LitElement {
+
+   private _secondaryInfoElementId = "-" + uid();
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (
++      changedProps.has("config") ||
++      changedProps.has("secondaryText") ||
++      changedProps.has("hideName") ||
++      changedProps.has("catchInteraction")
++    ) {
++      return true;
++    }
++    if (!changedProps.has("hass")) {
++      return false;
++    }
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) {
++      return true;
++    }
++    if (
++      oldHass.connected !== this.hass!.connected ||
++      oldHass.themes !== this.hass!.themes ||
++      oldHass.locale !== this.hass!.locale ||
++      oldHass.localize !== this.hass!.localize ||
++      oldHass.formatEntityState !== this.hass!.formatEntityState ||
++      oldHass.formatEntityAttributeName !==
++        this.hass!.formatEntityAttributeName ||
++      oldHass.formatEntityAttributeValue !==
++        this.hass!.formatEntityAttributeValue ||
++      oldHass.formatEntityName !== this.hass!.formatEntityName ||
++      oldHass.config.state !== this.hass!.config.state
++    ) {
++      return true;
++    }
++    if (
++      this.config?.entity &&
++      oldHass.states[this.config.entity] !==
++        this.hass!.states[this.config.entity]
++    ) {
++      return true;
++    }
++    if (
++      this.config?.secondary_info === "area" &&
++      (oldHass.entities !== this.hass!.entities ||
++        oldHass.devices !== this.hass!.devices ||
++        oldHass.areas !== this.hass!.areas ||
++        oldHass.floors !== this.hass!.floors)
++    ) {
++      return true;
++    }
++    return false;
++  }
++
+   protected render() {
+     if (!this.hass || !this.config) {
+       return nothing;
+diff --git a/src/panels/lovelace/components/hui-section-edit-mode.ts b/src/panels/lovelace/components/hui-section-edit-mode.ts
+index cca4f82f4..aa2ec9ecf 100644
+--- a/src/panels/lovelace/components/hui-section-edit-mode.ts
++++ b/src/panels/lovelace/components/hui-section-edit-mode.ts
+@@ -6,7 +6,7 @@ import {
+   mdiPencil,
+   mdiPlusCircleMultipleOutline,
+ } from "@mdi/js";
+-import type { CSSResultGroup, TemplateResult } from "lit";
++import type { CSSResultGroup, PropertyValues, TemplateResult } from "lit";
+ import { LitElement, css, html } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import "../../../components/ha-dropdown";
+@@ -17,6 +17,7 @@ import "../../../components/ha-svg-icon";
+ import { showConfirmationDialog } from "../../../dialogs/generic/show-dialog-box";
+ import { haStyle } from "../../../resources/styles";
+ import type { HomeAssistant } from "../../../types";
++import { hasConfigChanged } from "../common/has-changed";
+ import { deleteSection, duplicateSection } from "../editor/config-util";
+ import { findLovelaceContainer } from "../editor/lovelace-path";
+ import { showEditSectionDialog } from "../editor/section-editor/show-edit-section-dialog";
+@@ -32,6 +33,12 @@ export class HuiSectionEditMode extends LitElement {
+
+   @property({ attribute: false }) public viewIndex!: number;
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    const oldLovelace = changedProps.get("lovelace");
++    if (oldLovelace && oldLovelace.hass !== this.lovelace.hass) return true;
++    return hasConfigChanged(this, changedProps);
++  }
++
+   protected render(): TemplateResult {
+     return html`
+       <div class="section-header">
+diff --git a/src/panels/lovelace/elements/hui-image-element.ts b/src/panels/lovelace/elements/hui-image-element.ts
+index fd6baaf6d..10ccac37d 100644
+--- a/src/panels/lovelace/elements/hui-image-element.ts
++++ b/src/panels/lovelace/elements/hui-image-element.ts
+@@ -1,3 +1,4 @@
++import type { PropertyValues } from "lit";
+ import { css, html, LitElement, nothing } from "lit";
+ import { customElement, property, state } from "lit/decorators";
+ import { ifDefined } from "lit/directives/if-defined";
+@@ -9,6 +10,7 @@ import { computeTooltip } from "../common/compute-tooltip";
+ import { actionHandler } from "../common/directives/action-handler-directive";
+ import { handleAction } from "../common/handle-action";
+ import { hasAction } from "../common/has-action";
++import { hasConfigChanged } from "../common/has-changed";
+ import "../components/hui-image";
+ import type { LovelacePictureElementEditor } from "../types";
+ import type { ImageElementConfig, LovelaceElement } from "./types";
+@@ -41,6 +43,34 @@ export class HuiImageElement extends LitElement implements LovelaceElement {
+     );
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (hasConfigChanged(this, changedProps)) {
++      return true;
++    }
++
++    if (!changedProps.has("hass")) {
++      return false;
++    }
++
++    const oldHass = changedProps.get("hass") as HomeAssistant;
++
++    if (
++      this._config?.entity &&
++      oldHass.states[this._config.entity] !== this.hass!.states[this._config.entity]
++    ) {
++      return true;
++    }
++
++    if (
++      this._config?.image_entity &&
++      oldHass.states[this._config.image_entity] !== this.hass!.states[this._config.image_entity]
++    ) {
++      return true;
++    }
++
++    return false;
++  }
++
+   protected render() {
+     if (!this._config || !this.hass) {
+       return nothing;
+diff --git a/src/panels/lovelace/header-footer/hui-graph-header-footer.ts b/src/panels/lovelace/header-footer/hui-graph-header-footer.ts
+index df0838467..bcd3072d9 100644
+--- a/src/panels/lovelace/header-footer/hui-graph-header-footer.ts
++++ b/src/panels/lovelace/header-footer/hui-graph-header-footer.ts
+@@ -14,6 +14,7 @@ import {
+ } from "../../../data/history";
+ import type { HomeAssistant } from "../../../types";
+ import { findEntities } from "../common/find-entities";
++import { hasConfigChanged } from "../common/has-changed";
+ import { coordinatesMinimalResponseCompressedState } from "../common/graph/coordinates";
+ import "../components/hui-graph-base";
+ import type {
+@@ -104,6 +105,11 @@ export class HuiGraphHeaderFooter
+     this._config = cardConfig;
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("_coordinates") || changedProps.has("_error")) return true;
++    return hasConfigChanged(this, changedProps);
++  }
++
+   protected render() {
+     if (!this._config || !this.hass) {
+       return nothing;
+diff --git a/src/panels/lovelace/heading-badges/hui-entity-heading-badge.ts b/src/panels/lovelace/heading-badges/hui-entity-heading-badge.ts
+index 158816593..87ba527df 100644
+--- a/src/panels/lovelace/heading-badges/hui-entity-heading-badge.ts
++++ b/src/panels/lovelace/heading-badges/hui-entity-heading-badge.ts
+@@ -1,5 +1,6 @@
+ import { mdiAlertCircle } from "@mdi/js";
+ import type { HassEntity } from "home-assistant-js-websocket";
++import type { PropertyValues } from "lit";
+ import { LitElement, css, html, nothing } from "lit";
+ import { customElement, property, state } from "lit/decorators";
+ import { styleMap } from "lit/directives/style-map";
+@@ -18,6 +19,7 @@ import { actionHandler } from "../common/directives/action-handler-directive";
+ import { findEntities } from "../common/find-entities";
+ import { handleAction } from "../common/handle-action";
+ import { hasAction } from "../common/has-action";
++import { hasConfigOrEntityChanged } from "../common/has-changed";
+ import { DEFAULT_CONFIG } from "../editor/heading-badge-editor/hui-entity-heading-badge-editor";
+ import type {
+   LovelaceHeadingBadge,
+@@ -124,6 +126,10 @@ export class HuiEntityHeadingBadge
+     }
+   );
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    return hasConfigOrEntityChanged(this, changedProps);
++  }
++
+   protected render() {
+     if (!this.hass || !this._config) {
+       return nothing;
+diff --git a/src/state-control/alarm_control_panel/ha-state-control-alarm_control_panel-modes.ts b/src/state-control/alarm_control_panel/ha-state-control-alarm_control_panel-modes.ts
+index f591ffaa4..8a703cafb 100644
+--- a/src/state-control/alarm_control_panel/ha-state-control-alarm_control_panel-modes.ts
++++ b/src/state-control/alarm_control_panel/ha-state-control-alarm_control_panel-modes.ts
+@@ -70,6 +70,19 @@ export class HaStateControlAlarmControlPanelModes extends LitElement {
+     }
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("_currentMode")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render() {
+     const color = stateColorCss(this.stateObj);
+
+diff --git a/src/state-control/climate/ha-state-control-climate-humidity.ts b/src/state-control/climate/ha-state-control-climate-humidity.ts
+index aedd1deb2..2573cdf68 100644
+--- a/src/state-control/climate/ha-state-control-climate-humidity.ts
++++ b/src/state-control/climate/ha-state-control-climate-humidity.ts
+@@ -166,6 +166,19 @@ export class HaStateControlClimateHumidity extends LitElement {
+     `;
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("showCurrent") || changedProps.has("preventInteractionOnScroll") || changedProps.has("_targetHumidity")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render() {
+     const supportsTargetHumidity = supportsFeature(
+       this.stateObj,
+diff --git a/src/state-control/climate/ha-state-control-climate-temperature.ts b/src/state-control/climate/ha-state-control-climate-temperature.ts
+index 1aa03336e..49acaec58 100644
+--- a/src/state-control/climate/ha-state-control-climate-temperature.ts
++++ b/src/state-control/climate/ha-state-control-climate-temperature.ts
+@@ -409,6 +409,20 @@ export class HaStateControlClimateTemperature extends LitElement {
+     );
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("showSecondary") || changedProps.has("showCurrentAsPrimary") || changedProps.has("preventInteractionOnScroll") || changedProps.has("_targetTemperature") || changedProps.has("_selectTargetTemperature")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue ||
++        oldHass.config !== this.hass!.config) return true;
++    return false;
++  }
++
+   protected render() {
+     const mode = this.stateObj.state;
+     const action = this.stateObj.attributes.hvac_action;
+diff --git a/src/state-control/cover/ha-state-control-cover-buttons.ts b/src/state-control/cover/ha-state-control-cover-buttons.ts
+index 3b6be9d85..d8331f9cd 100644
+--- a/src/state-control/cover/ha-state-control-cover-buttons.ts
++++ b/src/state-control/cover/ha-state-control-cover-buttons.ts
+@@ -1,5 +1,5 @@
+ import { mdiArrowBottomLeft, mdiArrowTopRight, mdiStop } from "@mdi/js";
+-import type { TemplateResult } from "lit";
++import type { TemplateResult, PropertyValues } from "lit";
+ import { LitElement, css, html, nothing } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import { repeat } from "lit/directives/repeat";
+@@ -213,6 +213,19 @@ export class HaStateControlCoverButtons extends LitElement {
+     return nothing;
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render(): TemplateResult {
+     const layout = getCoverLayout(this.stateObj);
+
+diff --git a/src/state-control/cover/ha-state-control-cover-toggle.ts b/src/state-control/cover/ha-state-control-cover-toggle.ts
+index 8f3cfda0b..08f425a51 100644
+--- a/src/state-control/cover/ha-state-control-cover-toggle.ts
++++ b/src/state-control/cover/ha-state-control-cover-toggle.ts
+@@ -1,5 +1,5 @@
+ import type { HassEntity } from "home-assistant-js-websocket";
+-import type { TemplateResult } from "lit";
++import type { TemplateResult, PropertyValues } from "lit";
+ import { html, LitElement } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import { classMap } from "lit/directives/class-map";
+@@ -52,6 +52,19 @@ export class HaStateControlCoverToggle extends LitElement {
+     );
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render(): TemplateResult {
+     const onColor = stateColorCss(this.stateObj, "open");
+     const offColor = stateColorCss(this.stateObj, "closed");
+diff --git a/src/state-control/ha-state-control-toggle.ts b/src/state-control/ha-state-control-toggle.ts
+index 3f1a227a6..62ca86507 100644
+--- a/src/state-control/ha-state-control-toggle.ts
++++ b/src/state-control/ha-state-control-toggle.ts
+@@ -1,6 +1,6 @@
+ import { mdiFlash, mdiFlashOff } from "@mdi/js";
+ import type { HassEntity } from "home-assistant-js-websocket";
+-import type { TemplateResult } from "lit";
++import type { TemplateResult, PropertyValues } from "lit";
+ import { LitElement, html } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import { classMap } from "lit/directives/class-map";
+@@ -65,6 +65,19 @@ export class HaStateControlToggle extends LitElement {
+     });
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("iconPathOn") || changedProps.has("iconPathOff")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render(): TemplateResult {
+     const onColor = stateColorCss(this.stateObj, "on");
+     const offColor = stateColorCss(this.stateObj, "off");
+diff --git a/src/state-control/humidifier/ha-state-control-humidifier-humidity.ts b/src/state-control/humidifier/ha-state-control-humidifier-humidity.ts
+index 5240e12f2..b0f28e582 100644
+--- a/src/state-control/humidifier/ha-state-control-humidifier-humidity.ts
++++ b/src/state-control/humidifier/ha-state-control-humidifier-humidity.ts
+@@ -249,6 +249,19 @@ export class HaStateControlHumidifierHumidity extends LitElement {
+     `;
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("showSecondary") || changedProps.has("showCurrentAsPrimary") || changedProps.has("preventInteractionOnScroll") || changedProps.has("_targetHumidity")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render() {
+     const stateColor = stateColorCss(this.stateObj);
+     const active = stateActive(this.stateObj);
+diff --git a/src/state-control/lawn_mower/ha-state-control-lawn_mower-status.ts b/src/state-control/lawn_mower/ha-state-control-lawn_mower-status.ts
+index fa0d60170..29befa49a 100644
+--- a/src/state-control/lawn_mower/ha-state-control-lawn_mower-status.ts
++++ b/src/state-control/lawn_mower/ha-state-control-lawn_mower-status.ts
+@@ -1,4 +1,4 @@
+-import type { CSSResultGroup, TemplateResult } from "lit";
++import type { CSSResultGroup, PropertyValues, TemplateResult } from "lit";
+ import { css, html, LitElement } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import { styleMap } from "lit/directives/style-map";
+@@ -46,6 +46,19 @@ export class HaStateControlLawnMowerStatus extends LitElement {
+
+   @property({ attribute: false }) public stateObj!: LawnMowerEntity;
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render(): TemplateResult {
+     const visualState = computeVisualState(this.stateObj);
+     const color = stateColorCss(this.stateObj);
+diff --git a/src/state-control/light/ha-state-control-light-brightness.ts b/src/state-control/light/ha-state-control-light-brightness.ts
+index f32b5b210..ceb641348 100644
+--- a/src/state-control/light/ha-state-control-light-brightness.ts
++++ b/src/state-control/light/ha-state-control-light-brightness.ts
+@@ -40,6 +40,19 @@ export class HaStateControlLightBrightness extends LitElement {
+     });
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("value")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render(): TemplateResult {
+     let color = stateColorCss(this.stateObj);
+
+diff --git a/src/state-control/lock/ha-state-control-lock-toggle.ts b/src/state-control/lock/ha-state-control-lock-toggle.ts
+index b94347cc3..2a939709c 100644
+--- a/src/state-control/lock/ha-state-control-lock-toggle.ts
++++ b/src/state-control/lock/ha-state-control-lock-toggle.ts
+@@ -82,6 +82,19 @@ export class HaStateControlLockToggle extends LitElement {
+     );
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("_isOn")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render(): TemplateResult {
+     const locking = this.stateObj.state === "locking";
+     const unlocking = this.stateObj.state === "unlocking";
+diff --git a/src/state-control/vacuum/ha-state-control-vacuum-status.ts b/src/state-control/vacuum/ha-state-control-vacuum-status.ts
+index cd64e992b..ec2e999c5 100644
+--- a/src/state-control/vacuum/ha-state-control-vacuum-status.ts
++++ b/src/state-control/vacuum/ha-state-control-vacuum-status.ts
+@@ -1,4 +1,4 @@
+-import type { CSSResultGroup, TemplateResult } from "lit";
++import type { CSSResultGroup, PropertyValues, TemplateResult } from "lit";
+ import { css, html, LitElement } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import { styleMap } from "lit/directives/style-map";
+@@ -44,6 +44,19 @@ export class HaStateControlVacuumStatus extends LitElement {
+
+   @property({ attribute: false }) public stateObj!: VacuumEntity;
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render(): TemplateResult {
+     const visualState = computeVisualState(this.stateObj);
+     const color = stateColorCss(this.stateObj);
+diff --git a/src/state-control/valve/ha-state-control-valve-buttons.ts b/src/state-control/valve/ha-state-control-valve-buttons.ts
+index f1c43bf07..c31845c0e 100644
+--- a/src/state-control/valve/ha-state-control-valve-buttons.ts
++++ b/src/state-control/valve/ha-state-control-valve-buttons.ts
+@@ -1,5 +1,5 @@
+ import { mdiStop, mdiValveClosed, mdiValveOpen } from "@mdi/js";
+-import type { TemplateResult } from "lit";
++import type { TemplateResult, PropertyValues } from "lit";
+ import { LitElement, css, html, nothing } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import { repeat } from "lit/directives/repeat";
+@@ -101,6 +101,19 @@ export class HaStateControlValveButtons extends LitElement {
+     return nothing;
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render(): TemplateResult {
+     const buttons = getValveButtons(this.stateObj);
+
+diff --git a/src/state-control/valve/ha-state-control-valve-toggle.ts b/src/state-control/valve/ha-state-control-valve-toggle.ts
+index 8257fc908..0270c2a12 100644
+--- a/src/state-control/valve/ha-state-control-valve-toggle.ts
++++ b/src/state-control/valve/ha-state-control-valve-toggle.ts
+@@ -1,5 +1,5 @@
+ import type { HassEntity } from "home-assistant-js-websocket";
+-import type { TemplateResult } from "lit";
++import type { TemplateResult, PropertyValues } from "lit";
+ import { html, LitElement } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import { classMap } from "lit/directives/class-map";
+@@ -52,6 +52,19 @@ export class HaStateControlValveToggle extends LitElement {
+     );
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render(): TemplateResult {
+     const onColor = stateColorCss(this.stateObj, "open");
+     const offColor = stateColorCss(this.stateObj, "closed");
+diff --git a/src/state-control/water_heater/ha-state-control-water_heater-temperature.ts b/src/state-control/water_heater/ha-state-control-water_heater-temperature.ts
+index bf55d1599..f69a9b429 100644
+--- a/src/state-control/water_heater/ha-state-control-water_heater-temperature.ts
++++ b/src/state-control/water_heater/ha-state-control-water_heater-temperature.ts
+@@ -173,6 +173,20 @@ export class HaStateControlWaterHeaterTemperature extends LitElement {
+     `;
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("showCurrent") || changedProps.has("preventInteractionOnScroll") || changedProps.has("_targetTemperature")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue ||
++        oldHass.config !== this.hass!.config) return true;
++    return false;
++  }
++
+   protected render() {
+     const supportsTargetTemperature = supportsFeature(
+       this.stateObj,
+diff --git a/src/state-display/ha-timer-remaining-time.ts b/src/state-display/ha-timer-remaining-time.ts
+index 380efeaab..06058e9bc 100644
+--- a/src/state-display/ha-timer-remaining-time.ts
++++ b/src/state-display/ha-timer-remaining-time.ts
+@@ -19,6 +19,19 @@ class HaTimerRemainingTime extends ReactiveElement {
+     return this;
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("timeRemaining")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected update(changedProps: PropertyValues<this>) {
+     super.update(changedProps);
+     this.innerHTML =
+diff --git a/src/state-display/state-display.ts b/src/state-display/state-display.ts
+index ea46a16b9..3a56f08ba 100644
+--- a/src/state-display/state-display.ts
++++ b/src/state-display/state-display.ts
+@@ -1,5 +1,6 @@
+ import type { HassEntity } from "home-assistant-js-websocket";
+ import type { TemplateResult } from "lit";
++import type { PropertyValues } from "lit";
+ import { html, LitElement } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import { join } from "lit/directives/join";
+@@ -197,6 +198,19 @@ class StateDisplay extends LitElement {
+     return this.hass!.formatEntityAttributeValue(stateObj, content);
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("content") || changedProps.has("name") || changedProps.has("dashUnavailable")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render() {
+     const stateObj = this.stateObj;
+     const contents = ensureArray(this._content);
+diff --git a/src/state-summary/state-card-alert.ts b/src/state-summary/state-card-alert.ts
+index fa8af96f6..053cb703f 100755
+--- a/src/state-summary/state-card-alert.ts
++++ b/src/state-summary/state-card-alert.ts
+@@ -1,5 +1,5 @@
+ import type { HassEntity } from "home-assistant-js-websocket";
+-import type { CSSResultGroup, TemplateResult } from "lit";
++import type { CSSResultGroup, PropertyValues, TemplateResult } from "lit";
+ import { css, html, LitElement } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import { stateActive } from "../common/entity/state_active";
+@@ -16,6 +16,19 @@ class StateCardAlert extends LitElement {
+
+   @property({ attribute: "in-dialog", type: Boolean }) public inDialog = false;
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("inDialog")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render(): TemplateResult {
+     return html`
+       <div class="horizontal justified layout">
+diff --git a/src/state-summary/state-card-button.ts b/src/state-summary/state-card-button.ts
+index 583f71765..8bf214d73 100644
+--- a/src/state-summary/state-card-button.ts
++++ b/src/state-summary/state-card-button.ts
+@@ -1,5 +1,5 @@
+ import type { HassEntity } from "home-assistant-js-websocket";
+-import type { CSSResultGroup } from "lit";
++import type { CSSResultGroup, PropertyValues } from "lit";
+ import { css, html, LitElement } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import "../components/entity/ha-entity-toggle";
+@@ -17,6 +17,19 @@ class StateCardButton extends LitElement {
+
+   @property({ attribute: "in-dialog", type: Boolean }) public inDialog = false;
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("inDialog")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render() {
+     const stateObj = this.stateObj;
+     return html`
+diff --git a/src/state-summary/state-card-climate.ts b/src/state-summary/state-card-climate.ts
+index 59c5bb318..e1ecd3170 100644
+--- a/src/state-summary/state-card-climate.ts
++++ b/src/state-summary/state-card-climate.ts
+@@ -1,5 +1,5 @@
+ import type { HassEntity } from "home-assistant-js-websocket";
+-import type { CSSResultGroup, TemplateResult } from "lit";
++import type { CSSResultGroup, PropertyValues, TemplateResult } from "lit";
+ import { css, html, LitElement } from "lit";
+ import "../components/entity/state-info";
+ import "../components/ha-climate-state";
+@@ -15,6 +15,19 @@ class StateCardClimate extends LitElement {
+
+   @property({ attribute: "in-dialog", type: Boolean }) public inDialog = false;
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("inDialog")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render(): TemplateResult {
+     return html`
+       <div class="horizontal justified layout">
+diff --git a/src/state-summary/state-card-configurator.ts b/src/state-summary/state-card-configurator.ts
+index 210fd38b7..8c4fc6079 100644
+--- a/src/state-summary/state-card-configurator.ts
++++ b/src/state-summary/state-card-configurator.ts
+@@ -2,7 +2,7 @@ import type { HassEntity } from "home-assistant-js-websocket";
+ import "../components/entity/state-info";
+ import "../components/ha-button";
+ import { customElement, property } from "lit/decorators";
+-import type { CSSResultGroup, TemplateResult } from "lit";
++import type { CSSResultGroup, PropertyValues, TemplateResult } from "lit";
+ import { LitElement, css, html, nothing } from "lit";
+ import type { HomeAssistant } from "../types";
+ import { haStyle } from "../resources/styles";
+@@ -15,6 +15,19 @@ class StateCardConfigurator extends LitElement {
+
+   @property({ attribute: "in-dialog", type: Boolean }) public inDialog = false;
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("inDialog")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render(): TemplateResult {
+     return html`
+       <div class="horizontal justified layout">
+diff --git a/src/state-summary/state-card-content.ts b/src/state-summary/state-card-content.ts
+index b2c87e874..1dc9d5b6e 100644
+--- a/src/state-summary/state-card-content.ts
++++ b/src/state-summary/state-card-content.ts
+@@ -1,3 +1,4 @@
++import type { PropertyValues } from "lit";
+ import { LitElement, nothing } from "lit";
+ import type { HassEntity } from "home-assistant-js-websocket";
+ import { customElement, property } from "lit/decorators";
+@@ -38,6 +39,21 @@ class StateCardContent extends LitElement {
+
+   @property({ attribute: "in-dialog", type: Boolean }) public inDialog = false;
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("inDialog")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    // stateCardType -> canToggleState looks up hass.states for group members
++    if (oldHass.states !== this.hass!.states) return true;
++    return false;
++  }
++
+   protected render() {
+     let stateCard: string;
+     if (!this.stateObj || !this.hass) return nothing;
+diff --git a/src/state-summary/state-card-cover.ts b/src/state-summary/state-card-cover.ts
+index adb976d2d..723651e3c 100644
+--- a/src/state-summary/state-card-cover.ts
++++ b/src/state-summary/state-card-cover.ts
+@@ -1,4 +1,4 @@
+-import type { CSSResultGroup, TemplateResult } from "lit";
++import type { CSSResultGroup, PropertyValues, TemplateResult } from "lit";
+ import { css, html, LitElement } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import "../components/entity/state-info";
+@@ -17,6 +17,19 @@ class StateCardCover extends LitElement {
+
+   @property({ attribute: "in-dialog", type: Boolean }) public inDialog = false;
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("inDialog")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render(): TemplateResult {
+     return html`
+       <div class="horizontal justified layout">
+diff --git a/src/state-summary/state-card-display.ts b/src/state-summary/state-card-display.ts
+index 66c9bff25..920c244df 100755
+--- a/src/state-summary/state-card-display.ts
++++ b/src/state-summary/state-card-display.ts
+@@ -1,5 +1,5 @@
+ import type { HassEntity } from "home-assistant-js-websocket";
+-import type { CSSResultGroup, TemplateResult } from "lit";
++import type { CSSResultGroup, PropertyValues, TemplateResult } from "lit";
+ import { css, html, LitElement } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import { classMap } from "lit/directives/class-map";
+@@ -25,6 +25,19 @@ class StateCardDisplay extends LitElement {
+   // property used only in CSS
+   @property({ type: Boolean, reflect: true }) public rtl = false;
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("inDialog") || changedProps.has("rtl")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render(): TemplateResult {
+     return html`
+       <div class="horizontal justified layout">
+diff --git a/src/state-summary/state-card-event.ts b/src/state-summary/state-card-event.ts
+index 970bb8fe4..88a167e77 100644
+--- a/src/state-summary/state-card-event.ts
++++ b/src/state-summary/state-card-event.ts
+@@ -1,5 +1,5 @@
+ import type { HassEntity } from "home-assistant-js-websocket";
+-import type { CSSResultGroup } from "lit";
++import type { CSSResultGroup, PropertyValues } from "lit";
+ import { css, html, LitElement } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import "../components/entity/ha-entity-toggle";
+@@ -15,6 +15,19 @@ class StateCardEvent extends LitElement {
+
+   @property({ attribute: "in-dialog", type: Boolean }) public inDialog = false;
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("inDialog")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render() {
+     return html`
+       <div class="horizontal justified layout">
+diff --git a/src/state-summary/state-card-humidifier.ts b/src/state-summary/state-card-humidifier.ts
+index 61acfb5ac..dbde674b4 100644
+--- a/src/state-summary/state-card-humidifier.ts
++++ b/src/state-summary/state-card-humidifier.ts
+@@ -1,5 +1,5 @@
+ import type { HassEntity } from "home-assistant-js-websocket";
+-import type { CSSResultGroup, TemplateResult } from "lit";
++import type { CSSResultGroup, PropertyValues, TemplateResult } from "lit";
+ import { css, html, LitElement } from "lit";
+ import { customElement, property } from "lit/decorators";
+
+@@ -16,6 +16,19 @@ class StateCardHumidifier extends LitElement {
+
+   @property({ attribute: "in-dialog", type: Boolean }) public inDialog = false;
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("inDialog")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render(): TemplateResult {
+     return html`
+       <div class="horizontal justified layout">
+diff --git a/src/state-summary/state-card-input_button.ts b/src/state-summary/state-card-input_button.ts
+index cb0f8cea3..8647f9c52 100644
+--- a/src/state-summary/state-card-input_button.ts
++++ b/src/state-summary/state-card-input_button.ts
+@@ -1,5 +1,5 @@
+ import type { HassEntity } from "home-assistant-js-websocket";
+-import type { CSSResultGroup } from "lit";
++import type { CSSResultGroup, PropertyValues } from "lit";
+ import { css, html, LitElement } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import "../components/entity/ha-entity-toggle";
+@@ -17,6 +17,19 @@ class StateCardInputButton extends LitElement {
+
+   @property({ attribute: "in-dialog", type: Boolean }) public inDialog = false;
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("inDialog")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render() {
+     const stateObj = this.stateObj;
+     return html`
+diff --git a/src/state-summary/state-card-input_number.ts b/src/state-summary/state-card-input_number.ts
+index 408c65bc6..56a9b8a6b 100644
+--- a/src/state-summary/state-card-input_number.ts
++++ b/src/state-summary/state-card-input_number.ts
+@@ -1,5 +1,5 @@
+ import type { HassEntity } from "home-assistant-js-websocket";
+-import type { TemplateResult } from "lit";
++import type { PropertyValues, TemplateResult } from "lit";
+ import { css, html, LitElement, nothing } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import { debounce } from "../common/util/debounce";
+@@ -45,6 +45,19 @@ class StateCardInputNumber extends LitElement {
+     this._attachObserver();
+   }
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("inDialog")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render(): TemplateResult {
+     return html`
+       <state-info
+diff --git a/src/state-summary/state-card-input_select.ts b/src/state-summary/state-card-input_select.ts
+index 87a626e0b..71b0845ab 100644
+--- a/src/state-summary/state-card-input_select.ts
++++ b/src/state-summary/state-card-input_select.ts
+@@ -1,4 +1,4 @@
+-import type { TemplateResult } from "lit";
++import type { PropertyValues, TemplateResult } from "lit";
+ import { css, html, LitElement } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import { computeStateName } from "../common/entity/compute_state_name";
+@@ -16,6 +16,19 @@ class StateCardInputSelect extends LitElement {
+
+   @property({ attribute: false }) public stateObj!: InputSelectEntity;
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render(): TemplateResult {
+     const options = this.stateObj.attributes.options.map((option) => ({
+       value: option,
+diff --git a/src/state-summary/state-card-input_text.ts b/src/state-summary/state-card-input_text.ts
+index 514a2b468..71fef936e 100644
+--- a/src/state-summary/state-card-input_text.ts
++++ b/src/state-summary/state-card-input_text.ts
+@@ -19,6 +19,19 @@ class StateCardInputText extends LitElement {
+
+   @state() public value = "";
+
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("inDialog") || changedProps.has("value")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render(): TemplateResult {
+     return html`
+       <div class="horizontal justified layout">
+diff --git a/src/state-summary/state-card-lawn_mower.ts b/src/state-summary/state-card-lawn_mower.ts
+index 1a2c53d11..c0c6f2d12 100644
+--- a/src/state-summary/state-card-lawn_mower.ts
++++ b/src/state-summary/state-card-lawn_mower.ts
+@@ -1,5 +1,5 @@
+ import type { HassEntity } from "home-assistant-js-websocket";
+-import type { CSSResultGroup } from "lit";
++import type { CSSResultGroup, PropertyValues } from "lit";
+ import { LitElement, html } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import "../components/entity/state-info";
+@@ -15,6 +15,19 @@ class StateCardLawnMower extends LitElement {
+ 
+   @property({ attribute: "in-dialog", type: Boolean }) public inDialog = false;
+ 
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("inDialog")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   public render() {
+     const stateObj = this.stateObj;
+     return html`
+diff --git a/src/state-summary/state-card-lock.ts b/src/state-summary/state-card-lock.ts
+index 99eb92b58..5ead0a307 100644
+--- a/src/state-summary/state-card-lock.ts
++++ b/src/state-summary/state-card-lock.ts
+@@ -1,5 +1,5 @@
+ import type { HassEntity } from "home-assistant-js-websocket";
+-import type { CSSResultGroup, TemplateResult } from "lit";
++import type { CSSResultGroup, PropertyValues, TemplateResult } from "lit";
+ import { css, html, LitElement, nothing } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import { supportsFeature } from "../common/entity/supports-feature";
+@@ -17,6 +17,19 @@ class StateCardLock extends LitElement {
+ 
+   @property({ attribute: "in-dialog", type: Boolean }) public inDialog = false;
+ 
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("inDialog")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render(): TemplateResult {
+     const isLocked = this.stateObj.state === "locked";
+     const supportsOpen = supportsFeature(this.stateObj, LockEntityFeature.OPEN);
+diff --git a/src/state-summary/state-card-media_player.ts b/src/state-summary/state-card-media_player.ts
+index 57f279d2b..4c78904f6 100644
+--- a/src/state-summary/state-card-media_player.ts
++++ b/src/state-summary/state-card-media_player.ts
+@@ -1,5 +1,5 @@
+ import type { HassEntity } from "home-assistant-js-websocket";
+-import type { CSSResultGroup, TemplateResult } from "lit";
++import type { CSSResultGroup, PropertyValues, TemplateResult } from "lit";
+ import { css, html, LitElement } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import "../components/entity/state-info";
+@@ -15,6 +15,19 @@ class StateCardMediaPlayer extends LitElement {
+ 
+   @property({ attribute: "in-dialog", type: Boolean }) public inDialog = false;
+ 
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("inDialog")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render(): TemplateResult {
+     const playerObj = new HassMediaPlayerEntity(this.hass, this.stateObj);
+     return html`
+diff --git a/src/state-summary/state-card-number.ts b/src/state-summary/state-card-number.ts
+index 15ce8d250..e8b250ab2 100644
+--- a/src/state-summary/state-card-number.ts
++++ b/src/state-summary/state-card-number.ts
+@@ -1,5 +1,5 @@
+ import type { HassEntity } from "home-assistant-js-websocket";
+-import type { CSSResultGroup } from "lit";
++import type { CSSResultGroup, PropertyValues } from "lit";
+ import { css, html, LitElement, nothing } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import { debounce } from "../common/util/debounce";
+@@ -45,6 +45,19 @@ class StateCardNumber extends LitElement {
+     this._attachObserver();
+   }
+ 
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("inDialog")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render() {
+     const range = this.stateObj.attributes.max - this.stateObj.attributes.min;
+ 
+diff --git a/src/state-summary/state-card-scene.ts b/src/state-summary/state-card-scene.ts
+index 624d3e995..362a585f7 100644
+--- a/src/state-summary/state-card-scene.ts
++++ b/src/state-summary/state-card-scene.ts
+@@ -1,5 +1,5 @@
+ import type { HassEntity } from "home-assistant-js-websocket";
+-import type { CSSResultGroup } from "lit";
++import type { CSSResultGroup, PropertyValues } from "lit";
+ import { html, LitElement } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import "../components/entity/state-info";
+@@ -16,6 +16,19 @@ class StateCardScene extends LitElement {
+ 
+   @property({ attribute: "in-dialog", type: Boolean }) public inDialog = false;
+ 
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("inDialog")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render() {
+     return html`
+       <div class="horizontal justified layout">
+diff --git a/src/state-summary/state-card-script.ts b/src/state-summary/state-card-script.ts
+index 4d307831c..e8627c332 100644
+--- a/src/state-summary/state-card-script.ts
++++ b/src/state-summary/state-card-script.ts
+@@ -1,5 +1,5 @@
+ import type { HassEntity } from "home-assistant-js-websocket";
+-import type { CSSResultGroup } from "lit";
++import type { CSSResultGroup, PropertyValues } from "lit";
+ import { html, LitElement } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import "../components/entity/ha-entity-toggle";
+@@ -20,6 +20,19 @@ class StateCardScript extends LitElement {
+ 
+   @property({ attribute: "in-dialog", type: Boolean }) public inDialog = false;
+ 
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("inDialog")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render() {
+     const stateObj = this.stateObj as ScriptEntity;
+     return html`
+diff --git a/src/state-summary/state-card-select.ts b/src/state-summary/state-card-select.ts
+index 0956f280f..6028f6992 100644
+--- a/src/state-summary/state-card-select.ts
++++ b/src/state-summary/state-card-select.ts
+@@ -1,4 +1,4 @@
+-import type { TemplateResult } from "lit";
++import type { PropertyValues, TemplateResult } from "lit";
+ import { css, html, LitElement } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import { computeStateName } from "../common/entity/compute_state_name";
+@@ -16,6 +16,19 @@ class StateCardSelect extends LitElement {
+ 
+   @property({ attribute: false }) public stateObj!: SelectEntity;
+ 
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render(): TemplateResult {
+     const options = this.stateObj.attributes.options.map((option) => ({
+       value: option,
+diff --git a/src/state-summary/state-card-text.ts b/src/state-summary/state-card-text.ts
+index 8b09c070a..1773e68e3 100644
+--- a/src/state-summary/state-card-text.ts
++++ b/src/state-summary/state-card-text.ts
+@@ -1,4 +1,4 @@
+-import type { TemplateResult } from "lit";
++import type { PropertyValues, TemplateResult } from "lit";
+ import { css, html, LitElement } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import { stopPropagation } from "../common/dom/stop_propagation";
+@@ -17,6 +17,19 @@ class StateCardText extends LitElement {
+ 
+   @property({ attribute: false }) public stateObj!: TextEntity;
+ 
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render(): TemplateResult {
+     return html`
+       <state-badge .hass=${this.hass} .stateObj=${this.stateObj}></state-badge>
+diff --git a/src/state-summary/state-card-timer.ts b/src/state-summary/state-card-timer.ts
+index f83fdeb33..721b3ced3 100644
+--- a/src/state-summary/state-card-timer.ts
++++ b/src/state-summary/state-card-timer.ts
+@@ -1,5 +1,5 @@
+ import type { HassEntity } from "home-assistant-js-websocket";
+-import type { CSSResultGroup, TemplateResult } from "lit";
++import type { CSSResultGroup, PropertyValues, TemplateResult } from "lit";
+ import { css, html, LitElement } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import "../components/entity/state-info";
+@@ -15,6 +15,19 @@ class StateCardTimer extends LitElement {
+ 
+   @property({ attribute: "in-dialog", type: Boolean }) public inDialog = false;
+ 
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("inDialog")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render(): TemplateResult {
+     return html`
+       <div class="horizontal justified layout">
+diff --git a/src/state-summary/state-card-toggle.ts b/src/state-summary/state-card-toggle.ts
+index dbcd26777..522b7fdbf 100644
+--- a/src/state-summary/state-card-toggle.ts
++++ b/src/state-summary/state-card-toggle.ts
+@@ -1,5 +1,5 @@
+ import type { HassEntity } from "home-assistant-js-websocket";
+-import type { CSSResultGroup, TemplateResult } from "lit";
++import type { CSSResultGroup, PropertyValues, TemplateResult } from "lit";
+ import { css, html, LitElement } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import "../components/entity/ha-entity-toggle";
+@@ -15,6 +15,19 @@ class StateCardToggle extends LitElement {
+ 
+   @property({ attribute: "in-dialog", type: Boolean }) public inDialog = false;
+ 
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("inDialog")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render(): TemplateResult {
+     return html`
+       <div class="horizontal justified layout">
+diff --git a/src/state-summary/state-card-update.ts b/src/state-summary/state-card-update.ts
+index baa898d6b..8c68b988c 100755
+--- a/src/state-summary/state-card-update.ts
++++ b/src/state-summary/state-card-update.ts
+@@ -1,4 +1,4 @@
+-import type { CSSResultGroup, TemplateResult } from "lit";
++import type { CSSResultGroup, PropertyValues, TemplateResult } from "lit";
+ import { css, html, LitElement } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import "../components/entity/state-info";
+@@ -15,6 +15,19 @@ export class StateCardUpdate extends LitElement {
+ 
+   @property({ attribute: "in-dialog", type: Boolean }) public inDialog = false;
+ 
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("inDialog")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render(): TemplateResult {
+     return html`
+       <div class="horizontal justified layout">
+diff --git a/src/state-summary/state-card-vacuum.ts b/src/state-summary/state-card-vacuum.ts
+index 5a856000b..d94be7157 100644
+--- a/src/state-summary/state-card-vacuum.ts
++++ b/src/state-summary/state-card-vacuum.ts
+@@ -1,5 +1,5 @@
+ import type { HassEntity } from "home-assistant-js-websocket";
+-import type { CSSResultGroup, TemplateResult } from "lit";
++import type { CSSResultGroup, PropertyValues, TemplateResult } from "lit";
+ import { html, LitElement } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import "../components/entity/state-info";
+@@ -15,6 +15,19 @@ class StateCardVacuum extends LitElement {
+ 
+   @property({ attribute: "in-dialog", type: Boolean }) public inDialog = false;
+ 
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("inDialog")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render(): TemplateResult {
+     return html`
+       <div class="horizontal justified layout">
+diff --git a/src/state-summary/state-card-water_heater.ts b/src/state-summary/state-card-water_heater.ts
+index 14a2ceb6b..f696a7eeb 100644
+--- a/src/state-summary/state-card-water_heater.ts
++++ b/src/state-summary/state-card-water_heater.ts
+@@ -1,5 +1,5 @@
+ import type { HassEntity } from "home-assistant-js-websocket";
+-import type { CSSResultGroup, TemplateResult } from "lit";
++import type { CSSResultGroup, PropertyValues, TemplateResult } from "lit";
+ import { css, html, LitElement } from "lit";
+ import { customElement, property } from "lit/decorators";
+ import "../components/entity/state-info";
+@@ -15,6 +15,19 @@ class StateCardWaterHeater extends LitElement {
+ 
+   @property({ attribute: "in-dialog", type: Boolean }) public inDialog = false;
+ 
++  protected shouldUpdate(changedProps: PropertyValues): boolean {
++    if (changedProps.has("stateObj") || changedProps.has("inDialog")) return true;
++    if (!changedProps.has("hass")) return false;
++    const oldHass = changedProps.get("hass");
++    if (!oldHass) return true;
++    if (oldHass.locale !== this.hass!.locale ||
++        oldHass.localize !== this.hass!.localize ||
++        oldHass.formatEntityState !== this.hass!.formatEntityState ||
++        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
++        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
++    return false;
++  }
++
+   protected render(): TemplateResult {
+     return html`
+       <div class="horizontal justified layout">
