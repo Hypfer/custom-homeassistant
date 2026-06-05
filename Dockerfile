@@ -1,4 +1,4 @@
-ARG HA_IMAGE=ghcr.io/home-assistant/home-assistant:2026.5.2
+ARG HA_IMAGE=ghcr.io/home-assistant/home-assistant:2026.6.0
 
 FROM ${HA_IMAGE} AS extract
 
