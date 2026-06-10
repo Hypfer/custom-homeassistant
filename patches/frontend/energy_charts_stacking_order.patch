@@ -1,0 +1,181 @@
+Subject: [PATCH] Energy charts stacking order
+---
+Index: src/panels/lovelace/cards/energy/hui-power-sources-graph-card.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/panels/lovelace/cards/energy/hui-power-sources-graph-card.ts b/src/panels/lovelace/cards/energy/hui-power-sources-graph-card.ts
+--- a/src/panels/lovelace/cards/energy/hui-power-sources-graph-card.ts	(revision 66235a4c995682a1967dd1a5f821d6e0d1c27ef7)
++++ b/src/panels/lovelace/cards/energy/hui-power-sources-graph-card.ts	(date 1781112949312)
+@@ -236,7 +236,17 @@
+     };
+
+     const now = Date.now();
+-    Object.keys(statIds).forEach((key, keyIndex) => {
++    const seriesData: Record<
++      string,
++      {
++        colorHex: string;
++        rgb: [number, number, number];
++        positive: [number, number][];
++        negative: [number, number][];
++      }
++    > = {};
++
++    Object.keys(statIds).forEach((key) => {
+       if (statIds[key].stats.length) {
+         const colorHex = computedStyles.getPropertyValue(statIds[key].color);
+         const rgb = hex2rgb(colorHex);
+@@ -261,50 +271,62 @@
+           }),
+           trackY
+         );
+-        datasets.push({
+-          ...commonSeriesOptions,
+-          id: key,
+-          name: statIds[key].name,
+-          color: colorHex,
+-          stack: "positive",
+-          areaStyle: {
+-            color: new LinearGradient(0, 0, 0, 1, [
+-              {
+-                offset: 0,
+-                color: `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.75)`,
+-              },
+-              {
+-                offset: 1,
+-                color: `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.25)`,
+-              },
+-            ]),
+-          },
+-          data: positive,
+-          z: 3 - keyIndex, // draw in reverse order so 0 value lines are overwritten
+-        });
+-        if (key !== "solar") {
+-          datasets.push({
+-            ...commonSeriesOptions,
+-            id: `${key}-negative`,
+-            name: statIds[key].name,
+-            color: colorHex,
+-            stack: "negative",
+-            areaStyle: {
+-              color: new LinearGradient(0, 1, 0, 0, [
+-                {
+-                  offset: 0,
+-                  color: `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.75)`,
+-                },
+-                {
+-                  offset: 1,
+-                  color: `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.25)`,
+-                },
+-              ]),
+-            },
+-            data: negative,
+-            z: 4 - keyIndex, // draw in reverse order but above positive series
+-          });
+-        }
++
++        seriesData[key] = { colorHex, rgb, positive, negative };
++      }
++    });
++
++    const pushSeries = (
++      key: string,
++      data: [number, number][],
++      stack: "positive" | "negative",
++      z: number
++    ) => {
++      const { colorHex, rgb } = seriesData[key];
++
++      datasets.push({
++        ...commonSeriesOptions,
++        id: stack === "positive" ? key : `${key}-negative`,
++        name: statIds[key].name,
++        color: colorHex,
++        stack,
++        areaStyle: {
++          color: new LinearGradient(
++            0,
++            stack === "positive" ? 0 : 1,
++            0,
++            stack === "positive" ? 1 : 0,
++            [
++              { offset: 0, color: `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.75)` },
++              { offset: 1, color: `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.25)` },
++            ]
++          ),
++        },
++        data,
++        z,
++      });
++    };
++
++    // Push positive: solar (bottom), battery, grid (top)
++    // Draw in reverse order so 0 value lines are overwritten
++    ["solar", "battery", "grid"].forEach((key, i) => {
++      if (seriesData[key]) {
++        pushSeries(key, seriesData[key].positive, "positive", 3 - i);
++      }
++    });
++
++    // Push negative: battery (closest to axis), grid (bottom)
++    // Draw in reverse order but above positive series
++    ["battery", "grid"].forEach((key, i) => {
++      if (seriesData[key]) {
++        pushSeries(key, seriesData[key].negative, "negative", 4 - i);
++      }
++    });
++
++    Object.keys(statIds).forEach((key) => {
++      if (seriesData[key]) {
++        const { colorHex, rgb } = seriesData[key];
++
+         this._legendData!.push({
+           id: key,
+           secondaryIds: key !== "solar" ? [`${key}-negative`] : [],
+Index: src/panels/lovelace/cards/energy/hui-energy-usage-graph-card.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/panels/lovelace/cards/energy/hui-energy-usage-graph-card.ts b/src/panels/lovelace/cards/energy/hui-energy-usage-graph-card.ts
+--- a/src/panels/lovelace/cards/energy/hui-energy-usage-graph-card.ts	(revision 66235a4c995682a1967dd1a5f821d6e0d1c27ef7)
++++ b/src/panels/lovelace/cards/energy/hui-energy-usage-graph-card.ts	(date 1781112949308)
+@@ -51,6 +51,13 @@
+   used_battery: "--energy-battery-out-color",
+ };
+
++const stackOrder = {
++  to_battery: 1,
++  to_grid: 2,
++  used_solar: 3,
++  used_battery: 4,
++};
++
+ @customElement("hui-energy-usage-graph-card")
+ export class HuiEnergyUsageGraphCard
+   extends SubscribeMixin(LitElement)
+@@ -559,7 +566,7 @@
+       this._compareStart!
+     );
+
+-    Object.entries(combinedData).forEach(([type, sources], idx) => {
++    Object.entries(combinedData).forEach(([type, sources]) => {
+       Object.entries(sources).forEach(([statId, source]) => {
+         const points: BarSeriesOption["data"] = [];
+         // Process chart data.
+@@ -592,12 +599,7 @@
+                   statisticsMetaData[statId]
+                 ),
+           // @ts-expect-error
+-          order:
+-            type === "used_solar"
+-              ? 1
+-              : type === "to_battery"
+-                ? Object.keys(combinedData).length
+-                : idx + 2,
++          order: stackOrder[type] ?? Object.keys(combinedData).length,
+           barMaxWidth: 50,
+           itemStyle: {
+             borderColor: getEnergyColor(
