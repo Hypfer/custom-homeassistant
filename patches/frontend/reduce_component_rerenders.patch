@@ -1,72 +1,5 @@
-diff --git a/src/components/entity/ha-entity-picker.ts b/src/components/entity/ha-entity-picker.ts
-index f12e9347e..e8cb647ba 100644
---- a/src/components/entity/ha-entity-picker.ts
-+++ b/src/components/entity/ha-entity-picker.ts
-@@ -337,6 +337,29 @@ export class HaEntityPicker extends LitElement {
-     return !!this._findExtraOption(this.value)?.hide_clear;
-   }
-
-+  protected shouldUpdate(changedProps: PropertyValues): boolean {
-+    if (changedProps.has("autofocus") || changedProps.has("disabled") || changedProps.has("required") ||
-+        changedProps.has("allowCustomEntity") || changedProps.has("showEntityId") ||
-+        changedProps.has("label") || changedProps.has("value") || changedProps.has("helper") ||
-+        changedProps.has("placeholder") || changedProps.has("searchLabel") ||
-+        changedProps.has("createDomains") ||
-+        changedProps.has("addButton") || changedProps.has("addButtonLabel") ||
-+        changedProps.has("hideClearIcon") || changedProps.has("includeDomains") ||
-+        changedProps.has("excludeDomains") || changedProps.has("includeEntities") ||
-+        changedProps.has("excludeEntities") || changedProps.has("entityFilter") ||
-+        changedProps.has("includeDeviceClasses") || changedProps.has("includeUnitOfMeasurement") ||
-+        changedProps.has("extraOptions")) return true;
-+    if (!changedProps.has("hass")) return false;
-+    const oldHass = changedProps.get("hass");
-+    if (!oldHass) return true;
-+    return (
-+      oldHass.localize !== this.hass!.localize ||
-+      oldHass.states !== this.hass!.states ||
-+      oldHass.userData !== this.hass!.userData ||
-+      oldHass.loadFragmentTranslation !== this.hass!.loadFragmentTranslation
-+    );
-+  }
-+
-   protected render() {
-     const placeholder =
-       this.placeholder ??
-diff --git a/src/components/entity/ha-statistic-picker.ts b/src/components/entity/ha-statistic-picker.ts
-index 5c7cd5aea..7e9258bae 100644
---- a/src/components/entity/ha-statistic-picker.ts
-+++ b/src/components/entity/ha-statistic-picker.ts
-@@ -460,6 +460,28 @@ export class HaStatisticPicker extends LitElement {
-     `;
-   };
-
-+  protected shouldUpdate(changedProps: PropertyValues): boolean {
-+    if (changedProps.has("autofocus") || changedProps.has("disabled") || changedProps.has("required") ||
-+        changedProps.has("label") || changedProps.has("value") || changedProps.has("helper") ||
-+        changedProps.has("placeholder") || changedProps.has("allowCustomEntity") ||
-+        changedProps.has("hideClearIcon") || changedProps.has("statisticIds") ||
-+        changedProps.has("includeStatisticsUnitOfMeasurement") ||
-+        changedProps.has("includeUnitClass") || changedProps.has("includeDeviceClass") ||
-+        changedProps.has("entitiesOnly") || changedProps.has("excludeStatistics")) return true;
-+    if (!changedProps.has("hass")) return false;
-+    const oldHass = changedProps.get("hass");
-+    if (!oldHass) return true;
-+    return (
-+      oldHass.localize !== this.hass!.localize ||
-+      oldHass.states !== this.hass!.states ||
-+      oldHass.entities !== this.hass!.entities ||
-+      oldHass.devices !== this.hass!.devices ||
-+      oldHass.areas !== this.hass!.areas ||
-+      oldHass.floors !== this.hass!.floors ||
-+      oldHass.userData !== this.hass!.userData
-+    );
-+  }
-+
-   protected render() {
-     const placeholder =
-       this.placeholder ??
 diff --git a/src/components/entity/state-info.ts b/src/components/entity/state-info.ts
-index 9df328c77..a2aff5851 100644
+index 1be401a20..512595ca2 100644
 --- a/src/components/entity/state-info.ts
 +++ b/src/components/entity/state-info.ts
 @@ -1,4 +1,5 @@
@@ -106,54 +39,39 @@ index 9df328c77..a2aff5851 100644
    protected render() {
      if (!this.hass || !this.stateObj) {
        return nothing;
-diff --git a/src/components/ha-state-icon.ts b/src/components/ha-state-icon.ts
-index 66fc35cd4..13391a5df 100644
---- a/src/components/ha-state-icon.ts
-+++ b/src/components/ha-state-icon.ts
-@@ -1,4 +1,5 @@
- import type { HassEntity } from "home-assistant-js-websocket";
-+import type { PropertyValues } from "lit";
- import { html, LitElement, nothing } from "lit";
- import { customElement, property } from "lit/decorators";
- import { until } from "lit/directives/until";
-@@ -22,6 +23,37 @@ export class HaStateIcon extends LitElement {
-
-   @property() public icon?: string;
+diff --git a/src/components/entity/ha-statistic-picker.ts b/src/components/entity/ha-statistic-picker.ts
+index 5c7cd5aea..7e9258bae 100644
+--- a/src/components/entity/ha-statistic-picker.ts
++++ b/src/components/entity/ha-statistic-picker.ts
+@@ -460,6 +460,28 @@ export class HaStatisticPicker extends LitElement {
+     `;
+   };
 
 +  protected shouldUpdate(changedProps: PropertyValues): boolean {
-+    if (
-+      changedProps.has("stateObj") ||
-+      changedProps.has("stateValue") ||
-+      changedProps.has("icon")
-+    ) {
-+      return true;
-+    }
-+    if (!changedProps.has("hass")) {
-+      return false;
-+    }
++    if (changedProps.has("autofocus") || changedProps.has("disabled") || changedProps.has("required") ||
++        changedProps.has("label") || changedProps.has("value") || changedProps.has("helper") ||
++        changedProps.has("placeholder") || changedProps.has("allowCustomEntity") ||
++        changedProps.has("hideClearIcon") || changedProps.has("statisticIds") ||
++        changedProps.has("includeStatisticsUnitOfMeasurement") ||
++        changedProps.has("includeUnitClass") || changedProps.has("includeDeviceClass") ||
++        changedProps.has("entitiesOnly") || changedProps.has("excludeStatistics")) return true;
++    if (!changedProps.has("hass")) return false;
 +    const oldHass = changedProps.get("hass");
-+    if (!oldHass) {
-+      return true;
-+    }
-+    if (
-+      this.stateObj?.entity_id &&
-+      oldHass.entities[this.stateObj.entity_id] !==
-+        this.hass?.entities[this.stateObj.entity_id]
-+    ) {
-+      return true;
-+    }
-+    if (oldHass.config !== this.hass?.config) {
-+      return true;
-+    }
-+    if (oldHass.connection !== this.hass?.connection) {
-+      return true;
-+    }
-+    return false;
++    if (!oldHass) return true;
++    return (
++      oldHass.localize !== this.hass!.localize ||
++      oldHass.states !== this.hass!.states ||
++      oldHass.entities !== this.hass!.entities ||
++      oldHass.devices !== this.hass!.devices ||
++      oldHass.areas !== this.hass!.areas ||
++      oldHass.floors !== this.hass!.floors ||
++      oldHass.userData !== this.hass!.userData
++    );
 +  }
 +
    protected render() {
-     const overrideIcon =
-       this.icon ||
+     const placeholder =
+       this.placeholder ??
 diff --git a/src/panels/lovelace/badges/hui-entity-badge.ts b/src/panels/lovelace/badges/hui-entity-badge.ts
 index e7ac83c44..794537220 100644
 --- a/src/panels/lovelace/badges/hui-entity-badge.ts
@@ -204,30 +122,6 @@ index e7ac83c44..794537220 100644
    protected render() {
      if (!this._config || !this.hass) {
        return nothing;
-diff --git a/src/panels/lovelace/badges/hui-view-badges.ts b/src/panels/lovelace/badges/hui-view-badges.ts
-index f55e483e8..60190c8a8 100644
---- a/src/panels/lovelace/badges/hui-view-badges.ts
-+++ b/src/panels/lovelace/badges/hui-view-badges.ts
-@@ -12,6 +12,7 @@ import "../../../components/ha-svg-icon";
- import type { HomeAssistant } from "../../../types";
- import "../components/hui-badge-edit-mode";
- import { moveBadge } from "../editor/config-util";
-+import { hasConfigChanged } from "../common/has-changed";
- import type { LovelaceCardPath } from "../editor/lovelace-path";
- import type { Lovelace } from "../types";
- import type { HuiBadge } from "./hui-badge";
-@@ -116,6 +117,11 @@ export class HuiViewBadges extends LitElement {
-     fireEvent(this, "ll-create-badge");
-   }
-
-+  protected shouldUpdate(changedProps: PropertyValues): boolean {
-+    if (changedProps.has("badges") || changedProps.has("viewIndex") || changedProps.has("showAddLabel") || changedProps.has("_dragging") || changedProps.has("lovelace")) return true;
-+    return hasConfigChanged(this, changedProps);
-+  }
-+
-   render() {
-     if (!this.lovelace) return nothing;
-
 diff --git a/src/panels/lovelace/card-features/hui-alarm-modes-card-feature.ts b/src/panels/lovelace/card-features/hui-alarm-modes-card-feature.ts
 index 2648ae2be..63c20059a 100644
 --- a/src/panels/lovelace/card-features/hui-alarm-modes-card-feature.ts
@@ -697,7 +591,7 @@ index 0edd12757..3c2d46c7a 100644
 +++ b/src/panels/lovelace/card-features/hui-numeric-input-card-feature.ts
 @@ -10,6 +10,7 @@ import "../../../components/ha-control-slider";
  import "../../../components/ha-icon";
- import { isUnavailableState } from "../../../data/entity/entity";
+ import { UNAVAILABLE } from "../../../data/entity/entity";
  import type { HomeAssistant } from "../../../types";
 +import { hasConfigChanged } from "../common/has-changed";
  import type { LovelaceCardFeature, LovelaceCardFeatureEditor } from "../types";
@@ -1143,83 +1037,6 @@ index a478bb7ca..2be6dabd6 100644
    protected render(): TemplateResult | typeof nothing {
      if (!this._config || !this.hass) {
        return nothing;
-diff --git a/src/panels/lovelace/components/hui-badge-edit-mode.ts b/src/panels/lovelace/components/hui-badge-edit-mode.ts
-index d89120244..ff19c06fe 100644
---- a/src/panels/lovelace/components/hui-badge-edit-mode.ts
-+++ b/src/panels/lovelace/components/hui-badge-edit-mode.ts
-@@ -8,7 +8,7 @@ import {
-   mdiPlusCircleMultipleOutline,
- } from "@mdi/js";
- import deepClone from "deep-clone-simple";
--import type { CSSResultGroup, TemplateResult } from "lit";
-+import type { CSSResultGroup, PropertyValues, TemplateResult } from "lit";
- import { LitElement, css, html } from "lit";
- import { customElement, property, state } from "lit/decorators";
- import { classMap } from "lit/directives/class-map";
-@@ -23,6 +23,7 @@ import {
-   ensureBadgeConfig,
-   type LovelaceBadgeConfig,
- } from "../../../data/lovelace/config/badge";
-+import { hasConfigChanged } from "../common/has-changed";
- import { haStyle } from "../../../resources/styles";
- import type { HomeAssistant } from "../../../types";
- import { showEditBadgeDialog } from "../editor/badge-editor/show-edit-badge-dialog";
-@@ -107,6 +108,13 @@ export class HuiBadgeEditMode extends LitElement {
-     document.removeEventListener("click", this._documentClicked);
-   };
-
-+  protected shouldUpdate(changedProps: PropertyValues): boolean {
-+    const oldLovelace = changedProps.get("lovelace");
-+    if (oldLovelace && oldLovelace.hass !== this.lovelace.hass) return true;
-+    if (hasConfigChanged(this, changedProps)) return true;
-+    return changedProps.size > 0;
-+  }
-+
-   protected render(): TemplateResult {
-     const showOverlay =
-       (this._hover || this._menuOpened || this._focused) && !this.hiddenOverlay;
-diff --git a/src/panels/lovelace/components/hui-card-edit-mode.ts b/src/panels/lovelace/components/hui-card-edit-mode.ts
-index 93227f503..ac24754df 100644
---- a/src/panels/lovelace/components/hui-card-edit-mode.ts
-+++ b/src/panels/lovelace/components/hui-card-edit-mode.ts
-@@ -8,7 +8,7 @@ import {
-   mdiPencil,
-   mdiPlusCircleMultipleOutline,
- } from "@mdi/js";
--import type { CSSResultGroup, TemplateResult } from "lit";
-+import type { CSSResultGroup, PropertyValues, TemplateResult } from "lit";
- import { LitElement, css, html, nothing } from "lit";
- import { customElement, property, state } from "lit/decorators";
- import { classMap } from "lit/directives/class-map";
-@@ -20,6 +20,7 @@ import "../../../components/ha-icon-button";
- import "../../../components/ha-svg-icon";
- import { haStyle } from "../../../resources/styles";
- import type { HomeAssistant } from "../../../types";
-+import { hasConfigChanged } from "../common/has-changed";
- import type { LovelaceCardPath } from "../editor/lovelace-path";
- import type { Lovelace } from "../types";
-
-@@ -92,6 +93,20 @@ export class HuiCardEditMode extends LitElement {
-     document.removeEventListener("click", this._documentClicked);
-   };
-
-+  protected shouldUpdate(changedProps: PropertyValues): boolean {
-+    const oldLovelace = changedProps.get("lovelace");
-+    if (oldLovelace && oldLovelace.hass !== this.lovelace.hass) return true;
-+    if (hasConfigChanged(this, changedProps)) return true;
-+    return (
-+      changedProps.has("_hover") ||
-+      changedProps.has("_focused") ||
-+      changedProps.has("hiddenOverlay") ||
-+      changedProps.has("noEdit") ||
-+      changedProps.has("noDuplicate") ||
-+      changedProps.has("noMove")
-+    );
-+  }
-+
-   protected render(): TemplateResult {
-     const showOverlay = (this._hover || this._focused) && !this.hiddenOverlay;
-
 diff --git a/src/panels/lovelace/components/hui-generic-entity-row.ts b/src/panels/lovelace/components/hui-generic-entity-row.ts
 index 9b6f9008a..053daabcb 100644
 --- a/src/panels/lovelace/components/hui-generic-entity-row.ts
@@ -1421,392 +1238,6 @@ index 158816593..87ba527df 100644
    protected render() {
      if (!this.hass || !this._config) {
        return nothing;
-diff --git a/src/state-control/alarm_control_panel/ha-state-control-alarm_control_panel-modes.ts b/src/state-control/alarm_control_panel/ha-state-control-alarm_control_panel-modes.ts
-index f591ffaa4..8a703cafb 100644
---- a/src/state-control/alarm_control_panel/ha-state-control-alarm_control_panel-modes.ts
-+++ b/src/state-control/alarm_control_panel/ha-state-control-alarm_control_panel-modes.ts
-@@ -70,6 +70,19 @@ export class HaStateControlAlarmControlPanelModes extends LitElement {
-     }
-   }
-
-+  protected shouldUpdate(changedProps: PropertyValues): boolean {
-+    if (changedProps.has("stateObj") || changedProps.has("_currentMode")) return true;
-+    if (!changedProps.has("hass")) return false;
-+    const oldHass = changedProps.get("hass");
-+    if (!oldHass) return true;
-+    if (oldHass.locale !== this.hass!.locale ||
-+        oldHass.localize !== this.hass!.localize ||
-+        oldHass.formatEntityState !== this.hass!.formatEntityState ||
-+        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
-+        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
-+    return false;
-+  }
-+
-   protected render() {
-     const color = stateColorCss(this.stateObj);
-
-diff --git a/src/state-control/climate/ha-state-control-climate-humidity.ts b/src/state-control/climate/ha-state-control-climate-humidity.ts
-index aedd1deb2..2573cdf68 100644
---- a/src/state-control/climate/ha-state-control-climate-humidity.ts
-+++ b/src/state-control/climate/ha-state-control-climate-humidity.ts
-@@ -166,6 +166,19 @@ export class HaStateControlClimateHumidity extends LitElement {
-     `;
-   }
-
-+  protected shouldUpdate(changedProps: PropertyValues): boolean {
-+    if (changedProps.has("stateObj") || changedProps.has("showCurrent") || changedProps.has("preventInteractionOnScroll") || changedProps.has("_targetHumidity")) return true;
-+    if (!changedProps.has("hass")) return false;
-+    const oldHass = changedProps.get("hass");
-+    if (!oldHass) return true;
-+    if (oldHass.locale !== this.hass!.locale ||
-+        oldHass.localize !== this.hass!.localize ||
-+        oldHass.formatEntityState !== this.hass!.formatEntityState ||
-+        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
-+        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
-+    return false;
-+  }
-+
-   protected render() {
-     const supportsTargetHumidity = supportsFeature(
-       this.stateObj,
-diff --git a/src/state-control/climate/ha-state-control-climate-temperature.ts b/src/state-control/climate/ha-state-control-climate-temperature.ts
-index 1aa03336e..49acaec58 100644
---- a/src/state-control/climate/ha-state-control-climate-temperature.ts
-+++ b/src/state-control/climate/ha-state-control-climate-temperature.ts
-@@ -409,6 +409,20 @@ export class HaStateControlClimateTemperature extends LitElement {
-     );
-   }
-
-+  protected shouldUpdate(changedProps: PropertyValues): boolean {
-+    if (changedProps.has("stateObj") || changedProps.has("showSecondary") || changedProps.has("showCurrentAsPrimary") || changedProps.has("preventInteractionOnScroll") || changedProps.has("_targetTemperature") || changedProps.has("_selectTargetTemperature")) return true;
-+    if (!changedProps.has("hass")) return false;
-+    const oldHass = changedProps.get("hass");
-+    if (!oldHass) return true;
-+    if (oldHass.locale !== this.hass!.locale ||
-+        oldHass.localize !== this.hass!.localize ||
-+        oldHass.formatEntityState !== this.hass!.formatEntityState ||
-+        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
-+        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue ||
-+        oldHass.config !== this.hass!.config) return true;
-+    return false;
-+  }
-+
-   protected render() {
-     const mode = this.stateObj.state;
-     const action = this.stateObj.attributes.hvac_action;
-diff --git a/src/state-control/cover/ha-state-control-cover-buttons.ts b/src/state-control/cover/ha-state-control-cover-buttons.ts
-index 3b6be9d85..d8331f9cd 100644
---- a/src/state-control/cover/ha-state-control-cover-buttons.ts
-+++ b/src/state-control/cover/ha-state-control-cover-buttons.ts
-@@ -1,5 +1,5 @@
- import { mdiArrowBottomLeft, mdiArrowTopRight, mdiStop } from "@mdi/js";
--import type { TemplateResult } from "lit";
-+import type { TemplateResult, PropertyValues } from "lit";
- import { LitElement, css, html, nothing } from "lit";
- import { customElement, property } from "lit/decorators";
- import { repeat } from "lit/directives/repeat";
-@@ -213,6 +213,19 @@ export class HaStateControlCoverButtons extends LitElement {
-     return nothing;
-   }
-
-+  protected shouldUpdate(changedProps: PropertyValues): boolean {
-+    if (changedProps.has("stateObj")) return true;
-+    if (!changedProps.has("hass")) return false;
-+    const oldHass = changedProps.get("hass");
-+    if (!oldHass) return true;
-+    if (oldHass.locale !== this.hass!.locale ||
-+        oldHass.localize !== this.hass!.localize ||
-+        oldHass.formatEntityState !== this.hass!.formatEntityState ||
-+        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
-+        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
-+    return false;
-+  }
-+
-   protected render(): TemplateResult {
-     const layout = getCoverLayout(this.stateObj);
-
-diff --git a/src/state-control/cover/ha-state-control-cover-toggle.ts b/src/state-control/cover/ha-state-control-cover-toggle.ts
-index 8f3cfda0b..08f425a51 100644
---- a/src/state-control/cover/ha-state-control-cover-toggle.ts
-+++ b/src/state-control/cover/ha-state-control-cover-toggle.ts
-@@ -1,5 +1,5 @@
- import type { HassEntity } from "home-assistant-js-websocket";
--import type { TemplateResult } from "lit";
-+import type { TemplateResult, PropertyValues } from "lit";
- import { html, LitElement } from "lit";
- import { customElement, property } from "lit/decorators";
- import { classMap } from "lit/directives/class-map";
-@@ -52,6 +52,19 @@ export class HaStateControlCoverToggle extends LitElement {
-     );
-   }
-
-+  protected shouldUpdate(changedProps: PropertyValues): boolean {
-+    if (changedProps.has("stateObj")) return true;
-+    if (!changedProps.has("hass")) return false;
-+    const oldHass = changedProps.get("hass");
-+    if (!oldHass) return true;
-+    if (oldHass.locale !== this.hass!.locale ||
-+        oldHass.localize !== this.hass!.localize ||
-+        oldHass.formatEntityState !== this.hass!.formatEntityState ||
-+        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
-+        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
-+    return false;
-+  }
-+
-   protected render(): TemplateResult {
-     const onColor = stateColorCss(this.stateObj, "open");
-     const offColor = stateColorCss(this.stateObj, "closed");
-diff --git a/src/state-control/ha-state-control-toggle.ts b/src/state-control/ha-state-control-toggle.ts
-index 3f1a227a6..62ca86507 100644
---- a/src/state-control/ha-state-control-toggle.ts
-+++ b/src/state-control/ha-state-control-toggle.ts
-@@ -1,6 +1,6 @@
- import { mdiFlash, mdiFlashOff } from "@mdi/js";
- import type { HassEntity } from "home-assistant-js-websocket";
--import type { TemplateResult } from "lit";
-+import type { TemplateResult, PropertyValues } from "lit";
- import { LitElement, html } from "lit";
- import { customElement, property } from "lit/decorators";
- import { classMap } from "lit/directives/class-map";
-@@ -65,6 +65,19 @@ export class HaStateControlToggle extends LitElement {
-     });
-   }
-
-+  protected shouldUpdate(changedProps: PropertyValues): boolean {
-+    if (changedProps.has("stateObj") || changedProps.has("iconPathOn") || changedProps.has("iconPathOff")) return true;
-+    if (!changedProps.has("hass")) return false;
-+    const oldHass = changedProps.get("hass");
-+    if (!oldHass) return true;
-+    if (oldHass.locale !== this.hass!.locale ||
-+        oldHass.localize !== this.hass!.localize ||
-+        oldHass.formatEntityState !== this.hass!.formatEntityState ||
-+        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
-+        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
-+    return false;
-+  }
-+
-   protected render(): TemplateResult {
-     const onColor = stateColorCss(this.stateObj, "on");
-     const offColor = stateColorCss(this.stateObj, "off");
-diff --git a/src/state-control/humidifier/ha-state-control-humidifier-humidity.ts b/src/state-control/humidifier/ha-state-control-humidifier-humidity.ts
-index 5240e12f2..b0f28e582 100644
---- a/src/state-control/humidifier/ha-state-control-humidifier-humidity.ts
-+++ b/src/state-control/humidifier/ha-state-control-humidifier-humidity.ts
-@@ -249,6 +249,19 @@ export class HaStateControlHumidifierHumidity extends LitElement {
-     `;
-   }
-
-+  protected shouldUpdate(changedProps: PropertyValues): boolean {
-+    if (changedProps.has("stateObj") || changedProps.has("showSecondary") || changedProps.has("showCurrentAsPrimary") || changedProps.has("preventInteractionOnScroll") || changedProps.has("_targetHumidity")) return true;
-+    if (!changedProps.has("hass")) return false;
-+    const oldHass = changedProps.get("hass");
-+    if (!oldHass) return true;
-+    if (oldHass.locale !== this.hass!.locale ||
-+        oldHass.localize !== this.hass!.localize ||
-+        oldHass.formatEntityState !== this.hass!.formatEntityState ||
-+        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
-+        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
-+    return false;
-+  }
-+
-   protected render() {
-     const stateColor = stateColorCss(this.stateObj);
-     const active = stateActive(this.stateObj);
-diff --git a/src/state-control/lawn_mower/ha-state-control-lawn_mower-status.ts b/src/state-control/lawn_mower/ha-state-control-lawn_mower-status.ts
-index fa0d60170..29befa49a 100644
---- a/src/state-control/lawn_mower/ha-state-control-lawn_mower-status.ts
-+++ b/src/state-control/lawn_mower/ha-state-control-lawn_mower-status.ts
-@@ -1,4 +1,4 @@
--import type { CSSResultGroup, TemplateResult } from "lit";
-+import type { CSSResultGroup, PropertyValues, TemplateResult } from "lit";
- import { css, html, LitElement } from "lit";
- import { customElement, property } from "lit/decorators";
- import { styleMap } from "lit/directives/style-map";
-@@ -46,6 +46,19 @@ export class HaStateControlLawnMowerStatus extends LitElement {
-
-   @property({ attribute: false }) public stateObj!: LawnMowerEntity;
-
-+  protected shouldUpdate(changedProps: PropertyValues): boolean {
-+    if (changedProps.has("stateObj")) return true;
-+    if (!changedProps.has("hass")) return false;
-+    const oldHass = changedProps.get("hass");
-+    if (!oldHass) return true;
-+    if (oldHass.locale !== this.hass!.locale ||
-+        oldHass.localize !== this.hass!.localize ||
-+        oldHass.formatEntityState !== this.hass!.formatEntityState ||
-+        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
-+        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
-+    return false;
-+  }
-+
-   protected render(): TemplateResult {
-     const visualState = computeVisualState(this.stateObj);
-     const color = stateColorCss(this.stateObj);
-diff --git a/src/state-control/light/ha-state-control-light-brightness.ts b/src/state-control/light/ha-state-control-light-brightness.ts
-index f32b5b210..ceb641348 100644
---- a/src/state-control/light/ha-state-control-light-brightness.ts
-+++ b/src/state-control/light/ha-state-control-light-brightness.ts
-@@ -40,6 +40,19 @@ export class HaStateControlLightBrightness extends LitElement {
-     });
-   }
-
-+  protected shouldUpdate(changedProps: PropertyValues): boolean {
-+    if (changedProps.has("stateObj") || changedProps.has("value")) return true;
-+    if (!changedProps.has("hass")) return false;
-+    const oldHass = changedProps.get("hass");
-+    if (!oldHass) return true;
-+    if (oldHass.locale !== this.hass!.locale ||
-+        oldHass.localize !== this.hass!.localize ||
-+        oldHass.formatEntityState !== this.hass!.formatEntityState ||
-+        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
-+        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
-+    return false;
-+  }
-+
-   protected render(): TemplateResult {
-     let color = stateColorCss(this.stateObj);
-
-diff --git a/src/state-control/lock/ha-state-control-lock-toggle.ts b/src/state-control/lock/ha-state-control-lock-toggle.ts
-index b94347cc3..2a939709c 100644
---- a/src/state-control/lock/ha-state-control-lock-toggle.ts
-+++ b/src/state-control/lock/ha-state-control-lock-toggle.ts
-@@ -82,6 +82,19 @@ export class HaStateControlLockToggle extends LitElement {
-     );
-   }
-
-+  protected shouldUpdate(changedProps: PropertyValues): boolean {
-+    if (changedProps.has("stateObj") || changedProps.has("_isOn")) return true;
-+    if (!changedProps.has("hass")) return false;
-+    const oldHass = changedProps.get("hass");
-+    if (!oldHass) return true;
-+    if (oldHass.locale !== this.hass!.locale ||
-+        oldHass.localize !== this.hass!.localize ||
-+        oldHass.formatEntityState !== this.hass!.formatEntityState ||
-+        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
-+        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
-+    return false;
-+  }
-+
-   protected render(): TemplateResult {
-     const locking = this.stateObj.state === "locking";
-     const unlocking = this.stateObj.state === "unlocking";
-diff --git a/src/state-control/vacuum/ha-state-control-vacuum-status.ts b/src/state-control/vacuum/ha-state-control-vacuum-status.ts
-index cd64e992b..ec2e999c5 100644
---- a/src/state-control/vacuum/ha-state-control-vacuum-status.ts
-+++ b/src/state-control/vacuum/ha-state-control-vacuum-status.ts
-@@ -1,4 +1,4 @@
--import type { CSSResultGroup, TemplateResult } from "lit";
-+import type { CSSResultGroup, PropertyValues, TemplateResult } from "lit";
- import { css, html, LitElement } from "lit";
- import { customElement, property } from "lit/decorators";
- import { styleMap } from "lit/directives/style-map";
-@@ -44,6 +44,19 @@ export class HaStateControlVacuumStatus extends LitElement {
-
-   @property({ attribute: false }) public stateObj!: VacuumEntity;
-
-+  protected shouldUpdate(changedProps: PropertyValues): boolean {
-+    if (changedProps.has("stateObj")) return true;
-+    if (!changedProps.has("hass")) return false;
-+    const oldHass = changedProps.get("hass");
-+    if (!oldHass) return true;
-+    if (oldHass.locale !== this.hass!.locale ||
-+        oldHass.localize !== this.hass!.localize ||
-+        oldHass.formatEntityState !== this.hass!.formatEntityState ||
-+        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
-+        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
-+    return false;
-+  }
-+
-   protected render(): TemplateResult {
-     const visualState = computeVisualState(this.stateObj);
-     const color = stateColorCss(this.stateObj);
-diff --git a/src/state-control/valve/ha-state-control-valve-buttons.ts b/src/state-control/valve/ha-state-control-valve-buttons.ts
-index f1c43bf07..c31845c0e 100644
---- a/src/state-control/valve/ha-state-control-valve-buttons.ts
-+++ b/src/state-control/valve/ha-state-control-valve-buttons.ts
-@@ -1,5 +1,5 @@
- import { mdiStop, mdiValveClosed, mdiValveOpen } from "@mdi/js";
--import type { TemplateResult } from "lit";
-+import type { TemplateResult, PropertyValues } from "lit";
- import { LitElement, css, html, nothing } from "lit";
- import { customElement, property } from "lit/decorators";
- import { repeat } from "lit/directives/repeat";
-@@ -101,6 +101,19 @@ export class HaStateControlValveButtons extends LitElement {
-     return nothing;
-   }
-
-+  protected shouldUpdate(changedProps: PropertyValues): boolean {
-+    if (changedProps.has("stateObj")) return true;
-+    if (!changedProps.has("hass")) return false;
-+    const oldHass = changedProps.get("hass");
-+    if (!oldHass) return true;
-+    if (oldHass.locale !== this.hass!.locale ||
-+        oldHass.localize !== this.hass!.localize ||
-+        oldHass.formatEntityState !== this.hass!.formatEntityState ||
-+        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
-+        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
-+    return false;
-+  }
-+
-   protected render(): TemplateResult {
-     const buttons = getValveButtons(this.stateObj);
-
-diff --git a/src/state-control/valve/ha-state-control-valve-toggle.ts b/src/state-control/valve/ha-state-control-valve-toggle.ts
-index 8257fc908..0270c2a12 100644
---- a/src/state-control/valve/ha-state-control-valve-toggle.ts
-+++ b/src/state-control/valve/ha-state-control-valve-toggle.ts
-@@ -1,5 +1,5 @@
- import type { HassEntity } from "home-assistant-js-websocket";
--import type { TemplateResult } from "lit";
-+import type { TemplateResult, PropertyValues } from "lit";
- import { html, LitElement } from "lit";
- import { customElement, property } from "lit/decorators";
- import { classMap } from "lit/directives/class-map";
-@@ -52,6 +52,19 @@ export class HaStateControlValveToggle extends LitElement {
-     );
-   }
-
-+  protected shouldUpdate(changedProps: PropertyValues): boolean {
-+    if (changedProps.has("stateObj")) return true;
-+    if (!changedProps.has("hass")) return false;
-+    const oldHass = changedProps.get("hass");
-+    if (!oldHass) return true;
-+    if (oldHass.locale !== this.hass!.locale ||
-+        oldHass.localize !== this.hass!.localize ||
-+        oldHass.formatEntityState !== this.hass!.formatEntityState ||
-+        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
-+        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
-+    return false;
-+  }
-+
-   protected render(): TemplateResult {
-     const onColor = stateColorCss(this.stateObj, "open");
-     const offColor = stateColorCss(this.stateObj, "closed");
-diff --git a/src/state-control/water_heater/ha-state-control-water_heater-temperature.ts b/src/state-control/water_heater/ha-state-control-water_heater-temperature.ts
-index bf55d1599..f69a9b429 100644
---- a/src/state-control/water_heater/ha-state-control-water_heater-temperature.ts
-+++ b/src/state-control/water_heater/ha-state-control-water_heater-temperature.ts
-@@ -173,6 +173,20 @@ export class HaStateControlWaterHeaterTemperature extends LitElement {
-     `;
-   }
-
-+  protected shouldUpdate(changedProps: PropertyValues): boolean {
-+    if (changedProps.has("stateObj") || changedProps.has("showCurrent") || changedProps.has("preventInteractionOnScroll") || changedProps.has("_targetTemperature")) return true;
-+    if (!changedProps.has("hass")) return false;
-+    const oldHass = changedProps.get("hass");
-+    if (!oldHass) return true;
-+    if (oldHass.locale !== this.hass!.locale ||
-+        oldHass.localize !== this.hass!.localize ||
-+        oldHass.formatEntityState !== this.hass!.formatEntityState ||
-+        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
-+        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue ||
-+        oldHass.config !== this.hass!.config) return true;
-+    return false;
-+  }
-+
-   protected render() {
-     const supportsTargetTemperature = supportsFeature(
-       this.stateObj,
 diff --git a/src/state-display/ha-timer-remaining-time.ts b/src/state-display/ha-timer-remaining-time.ts
 index 380efeaab..06058e9bc 100644
 --- a/src/state-display/ha-timer-remaining-time.ts
@@ -1835,14 +1266,13 @@ diff --git a/src/state-display/state-display.ts b/src/state-display/state-displa
 index ea46a16b9..3a56f08ba 100644
 --- a/src/state-display/state-display.ts
 +++ b/src/state-display/state-display.ts
-@@ -1,5 +1,6 @@
+@@ -1,4 +1,5 @@
+ import memoizeOne from "memoize-one";
  import type { HassEntity } from "home-assistant-js-websocket";
  import type { TemplateResult } from "lit";
 +import type { PropertyValues } from "lit";
  import { html, LitElement } from "lit";
- import { customElement, property } from "lit/decorators";
- import { join } from "lit/directives/join";
-@@ -197,6 +198,19 @@ class StateDisplay extends LitElement {
+@@ -246,6 +247,19 @@ class StateDisplay extends LitElement {
      return this.hass!.formatEntityAttributeValue(stateObj, content);
    }
 
@@ -2475,7 +1905,7 @@ index 0956f280f..6028f6992 100644
      const options = this.stateObj.attributes.options.map((option) => ({
        value: option,
 diff --git a/src/state-summary/state-card-text.ts b/src/state-summary/state-card-text.ts
-index 8b09c070a..1773e68e3 100644
+index 953fe069b..a9f269857 100644
 --- a/src/state-summary/state-card-text.ts
 +++ b/src/state-summary/state-card-text.ts
 @@ -1,4 +1,4 @@
@@ -2485,9 +1915,9 @@ index 8b09c070a..1773e68e3 100644
  import { customElement, property } from "lit/decorators";
  import { stopPropagation } from "../common/dom/stop_propagation";
 @@ -17,6 +17,19 @@ class StateCardText extends LitElement {
- 
+
    @property({ attribute: false }) public stateObj!: TextEntity;
- 
+
 +  protected shouldUpdate(changedProps: PropertyValues): boolean {
 +    if (changedProps.has("stateObj")) return true;
 +    if (!changedProps.has("hass")) return false;
@@ -2503,7 +1933,7 @@ index 8b09c070a..1773e68e3 100644
 +
    protected render(): TemplateResult {
      return html`
-       <state-badge .hass=${this.hass} .stateObj=${this.stateObj}></state-badge>
+       <state-badge .stateObj=${this.stateObj}></state-badge>
 diff --git a/src/state-summary/state-card-timer.ts b/src/state-summary/state-card-timer.ts
 index f83fdeb33..721b3ced3 100644
 --- a/src/state-summary/state-card-timer.ts

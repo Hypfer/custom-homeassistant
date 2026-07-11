@@ -1,8 +1,8 @@
 diff --git a/src/data/light.ts b/src/data/light.ts
-index d2b699e5c..3ad99be03 100644
+index 83d4bae02..21117dcff 100644
 --- a/src/data/light.ts
 +++ b/src/data/light.ts
-@@ -111,12 +111,13 @@ export type LightColor =
+@@ -106,12 +106,13 @@ export type LightColor =
        rgbww_color: [number, number, number, number, number];
      };
  
@@ -21,7 +21,7 @@ index d2b699e5c..3ad99be03 100644
  ] as LightColor[];
  
  export const computeDefaultFavoriteColors = (
-@@ -131,26 +132,54 @@ export const computeDefaultFavoriteColors = (
+@@ -126,26 +127,54 @@ export const computeDefaultFavoriteColors = (
  
    const supportsColor = lightSupportsColor(stateObj);
  
@@ -95,24 +95,19 @@ index d2b699e5c..3ad99be03 100644
    }
  
    if (supportsColor) {
-@@ -159,5 +188,3 @@ export const computeDefaultFavoriteColors = (
- 
-   return colors;
- };
--
--export const formatTempColor = (value: number) => `${value} K`;
 diff --git a/src/dialogs/more-info/components/lights/ha-more-info-light-favorite-colors.ts b/src/dialogs/more-info/components/lights/ha-more-info-light-favorite-colors.ts
-index 4e8f5c58d..bef610343 100644
+index 4ca24db54..bc33ec739 100644
 --- a/src/dialogs/more-info/components/lights/ha-more-info-light-favorite-colors.ts
 +++ b/src/dialogs/more-info/components/lights/ha-more-info-light-favorite-colors.ts
-@@ -1,5 +1,5 @@
+@@ -1,6 +1,6 @@
+ import { consume, type ContextType } from "@lit/context";
  import type { PropertyValues, TemplateResult } from "lit";
 -import { LitElement, html } from "lit";
 +import { LitElement, css, html } from "lit";
  import { customElement, property, state } from "lit/decorators";
+ import { consumeLocalize } from "../../../../common/decorators/consume-context-entry";
  import type { HASSDomEvent } from "../../../../common/dom/fire_event";
- import { fireEvent } from "../../../../common/dom/fire_event";
-@@ -33,6 +33,12 @@ export class HaMoreInfoLightFavoriteColors extends LitElement {
+@@ -46,6 +46,12 @@ export class HaMoreInfoLightFavoriteColors extends LitElement {
  
    @state() private _favoriteColors: LightColor[] = [];
  
