@@ -1,0 +1,153 @@
+diff --git a/src/data/condition.ts b/src/data/condition.ts
+index 907db629b..a5bf1e823 100644
+--- a/src/data/condition.ts
++++ b/src/data/condition.ts
+@@ -6,9 +6,17 @@ import type { AutomationElementGroupCollection } from "./automation";
+ import type { Selector, TargetSelector } from "./selector";
+ 
+ export const CONDITION_COLLECTIONS: AutomationElementGroupCollection[] = [
++  {
++    titleKey:
++      "ui.panel.config.automation.editor.conditions.groups.generic.label",
++    generic: true,
++    groups: {
++      device: {},
++      entity: { icon: mdiShape, members: { state: {}, numeric_state: {} } },
++    },
++  },
+   {
+     groups: {
+-      dynamicGroups: {},
+       time: {
+         icon: mdiClockOutline,
+         members: { time: {} },
+@@ -18,19 +26,15 @@ export const CONDITION_COLLECTIONS: AutomationElementGroupCollection[] = [
+         icon: mdiWeatherSunny,
+         domains: ["sun"],
+       },
+-      helpers: {},
+       template: {},
+       trigger: {},
+       other: {},
+     },
+   },
+   {
+-    titleKey:
+-      "ui.panel.config.automation.editor.conditions.groups.generic.label",
+-    generic: true,
+     groups: {
+-      device: {},
+-      entity: { icon: mdiShape, members: { state: {}, numeric_state: {} } },
++      dynamicGroups: {},
++      helpers: {},
+     },
+   },
+   {
+diff --git a/src/data/trigger.ts b/src/data/trigger.ts
+index f06cb8779..2de9f400e 100644
+--- a/src/data/trigger.ts
++++ b/src/data/trigger.ts
+@@ -11,9 +11,16 @@ import type {
+ import type { Selector, TargetSelector } from "./selector";
+ 
+ export const TRIGGER_COLLECTIONS: AutomationElementGroupCollection[] = [
++  {
++    titleKey: "ui.panel.config.automation.editor.triggers.groups.generic.label",
++    generic: true,
++    groups: {
++      device: {},
++      entity: { icon: mdiShape, members: { state: {}, numeric_state: {} } },
++    },
++  },
+   {
+     groups: {
+-      dynamicGroups: {},
+       time: {
+         icon: mdiClockOutline,
+         members: {
+@@ -34,16 +41,13 @@ export const TRIGGER_COLLECTIONS: AutomationElementGroupCollection[] = [
+       template: {},
+       webhook: {},
+       persistent_notification: {},
+-      helpers: {},
+-      other: {},
+     },
+   },
+   {
+-    titleKey: "ui.panel.config.automation.editor.triggers.groups.generic.label",
+-    generic: true,
+     groups: {
+-      device: {},
+-      entity: { icon: mdiShape, members: { state: {}, numeric_state: {} } },
++      dynamicGroups: {},
++      helpers: {},
++      other: {},
+     },
+   },
+   {
+diff --git a/src/panels/config/automation/add-automation-element-dialog.ts b/src/panels/config/automation/add-automation-element-dialog.ts
+index 6c29f82ab..93747aabd 100644
+--- a/src/panels/config/automation/add-automation-element-dialog.ts
++++ b/src/panels/config/automation/add-automation-element-dialog.ts
+@@ -218,7 +218,7 @@ class DialogAddAutomationElement
+ 
+   @state() private _selectedTarget?: SingleHassServiceTarget;
+ 
+-  @state() private _tab: "targets" | "groups" | "blocks" = "targets";
++  @state() private _tab: "targets" | "groups" | "blocks" = "groups";
+ 
+   @state() private _filter = "";
+ 
+@@ -400,7 +400,7 @@ class DialogAddAutomationElement
+     this._selectedCollectionIndex = undefined;
+     this._selectedGroup = undefined;
+     this._selectedTarget = undefined;
+-    this._tab = "targets";
++    this._tab = "groups";
+     this._filter = "";
+     this._manifests = undefined;
+     this._domains = undefined;
+@@ -584,12 +584,6 @@ class DialogAddAutomationElement
+     const automationElementType = this._params!.type;
+ 
+     const tabButtons = [
+-      {
+-        label: this.hass.localize(
+-          "ui.panel.config.automation.editor.tabs.target"
+-        ),
+-        value: "targets",
+-      },
+       {
+         label: this.hass.localize(
+           "ui.panel.config.automation.editor.tabs.type"
+@@ -605,6 +599,13 @@ class DialogAddAutomationElement
+       });
+     }
+ 
++    tabButtons.push({
++      label: this.hass.localize(
++        "ui.panel.config.automation.editor.tabs.target"
++      ),
++      value: "targets",
++    });
++
+     const hideCollections =
+       this._filter ||
+       this._tab === "blocks" ||
+@@ -766,12 +767,14 @@ class DialogAddAutomationElement
+                         <wa-divider></wa-divider>`
+                     : nothing}
+                   ${collections.map(
+-                    (collection) => html`
++                    (collection, collectionIdx) => html`
+                       ${collection.titleKey && collection.groups.length
+                         ? html`<ha-section-title>
+                             ${this.hass.localize(collection.titleKey)}
+                           </ha-section-title>`
+-                        : nothing}
++                        : collectionIdx > 0
++                          ? html`<wa-divider></wa-divider>`
++                          : nothing}
+                       ${repeat(
+                         collection.groups,
+                         (item) => item.key,
