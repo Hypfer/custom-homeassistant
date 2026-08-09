@@ -1,4 +1,4 @@
-ARG HA_IMAGE=ghcr.io/home-assistant/home-assistant:2026.7.2
+ARG HA_IMAGE=ghcr.io/home-assistant/home-assistant:2026.8.1
 
 FROM ${HA_IMAGE} AS extract
 
@@ -28,14 +28,13 @@ RUN cd /frontend && \
         patch -p1 --no-backup-if-mismatch < "$patch"; \
     done
 
-COPY patchers/disable_system_dark_mode.py /disable_system_dark_mode.py
-RUN python3 /disable_system_dark_mode.py /frontend
+COPY patchers /patchers
 
-COPY patchers/custom_version_suffix.py /custom_version_suffix.py
-RUN python3 /custom_version_suffix.py /frontend
-
-COPY patchers/force_reduced_motion.py /force_reduced_motion.py
-RUN python3 /force_reduced_motion.py /frontend
+RUN set -euo pipefail && \
+    for patcher in /patchers/*.py; do \
+        echo "Running $patcher"; \
+        python3 "$patcher" /frontend; \
+    done
 
 RUN BUILD_TS=$(date +%s) && \
     sed -i "s/version      = \"\([^\"]*\)\"/version      = \"\1+custom.${BUILD_TS}\"/" /frontend/pyproject.toml && \
