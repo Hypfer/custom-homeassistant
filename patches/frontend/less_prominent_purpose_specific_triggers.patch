@@ -1,5 +1,5 @@
 diff --git a/src/data/condition.ts b/src/data/condition.ts
-index 8c70dee8a..c85064516 100644
+index 8c70dee..c850645 100644
 --- a/src/data/condition.ts
 +++ b/src/data/condition.ts
 @@ -6,9 +6,17 @@ import type { AutomationElementGroupCollection } from "./automation";
@@ -43,7 +43,7 @@ index 8c70dee8a..c85064516 100644
    },
    {
 diff --git a/src/data/trigger.ts b/src/data/trigger.ts
-index 9ff823913..e4e004103 100644
+index 9ff8239..e4e0041 100644
 --- a/src/data/trigger.ts
 +++ b/src/data/trigger.ts
 @@ -11,9 +11,16 @@ import type {
@@ -83,10 +83,10 @@ index 9ff823913..e4e004103 100644
    },
    {
 diff --git a/src/panels/config/automation/add-automation-element-dialog.ts b/src/panels/config/automation/add-automation-element-dialog.ts
-index b1af7e041..0eec7428a 100644
+index bd3763a..f08655d 100644
 --- a/src/panels/config/automation/add-automation-element-dialog.ts
 +++ b/src/panels/config/automation/add-automation-element-dialog.ts
-@@ -219,7 +219,7 @@ class DialogAddAutomationElement
+@@ -216,7 +216,7 @@ class DialogAddAutomationElement
  
    @state() private _selectedTarget?: SingleHassServiceTarget;
  
@@ -95,7 +95,7 @@ index b1af7e041..0eec7428a 100644
  
    @state() private _filter = "";
  
-@@ -401,7 +401,7 @@ class DialogAddAutomationElement
+@@ -398,7 +398,7 @@ class DialogAddAutomationElement
      this._selectedCollectionIndex = undefined;
      this._selectedGroup = undefined;
      this._selectedTarget = undefined;
@@ -104,7 +104,7 @@ index b1af7e041..0eec7428a 100644
      this._filter = "";
      this._manifests = undefined;
      this._domains = undefined;
-@@ -586,29 +586,30 @@ class DialogAddAutomationElement
+@@ -583,29 +583,30 @@ class DialogAddAutomationElement
    private _renderContent() {
      const automationElementType = this._params!.type;
  
@@ -152,9 +152,9 @@ index b1af7e041..0eec7428a 100644
        this._filter ||
        this._tab === "blocks" ||
        this._tab === "targets" ||
-@@ -781,13 +782,15 @@ class DialogAddAutomationElement
-                         : nothing
-                     }
+@@ -739,13 +740,15 @@ class DialogAddAutomationElement
+                       divider
+                     ></ha-automation-add-element-paste>
                      ${collections.map(
 -                      (collection) => html`
 +                      (collection, collectionIdx) => html`

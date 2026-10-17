@@ -1,8 +1,8 @@
 diff --git a/src/components/entity/ha-statistic-picker.ts b/src/components/entity/ha-statistic-picker.ts
-index 6a2eeb4c8..b90c68303 100644
+index 6e38996..bc85fb3 100644
 --- a/src/components/entity/ha-statistic-picker.ts
 +++ b/src/components/entity/ha-statistic-picker.ts
-@@ -519,6 +519,28 @@ export class HaStatisticPicker extends LitElement {
+@@ -501,6 +501,28 @@ export class HaStatisticPicker extends LitElement {
      `;
    };
  
@@ -32,7 +32,7 @@ index 6a2eeb4c8..b90c68303 100644
      const placeholder =
        this.placeholder ??
 diff --git a/src/components/entity/state-info.ts b/src/components/entity/state-info.ts
-index 16e93c124..0919f8f1a 100644
+index 16e93c1..0919f8f 100644
 --- a/src/components/entity/state-info.ts
 +++ b/src/components/entity/state-info.ts
 @@ -1,4 +1,5 @@
@@ -73,7 +73,7 @@ index 16e93c124..0919f8f1a 100644
      if (!this.hass || !this.stateObj) {
        return nothing;
 diff --git a/src/panels/lovelace/badges/hui-entity-badge.ts b/src/panels/lovelace/badges/hui-entity-badge.ts
-index 667f19c89..536fa5552 100644
+index 64dd75b..b9a315a 100644
 --- a/src/panels/lovelace/badges/hui-entity-badge.ts
 +++ b/src/panels/lovelace/badges/hui-entity-badge.ts
 @@ -1,5 +1,6 @@
@@ -83,7 +83,7 @@ index 667f19c89..536fa5552 100644
  import { css, html, LitElement, nothing } from "lit";
  import { customElement, property, state } from "lit/decorators";
  import { classMap } from "lit/directives/class-map";
-@@ -154,6 +155,38 @@ export class HuiEntityBadge extends LitElement implements LovelaceBadge {
+@@ -153,6 +154,38 @@ export class HuiEntityBadge extends LitElement implements LovelaceBadge {
      return imageUrl;
    }
  
@@ -123,7 +123,7 @@ index 667f19c89..536fa5552 100644
      if (!this._config || !this.hass) {
        return nothing;
 diff --git a/src/panels/lovelace/cards/hui-discovered-devices-card.ts b/src/panels/lovelace/cards/hui-discovered-devices-card.ts
-index 1d7129aee..2399c975d 100644
+index 1d7129a..2399c97 100644
 --- a/src/panels/lovelace/cards/hui-discovered-devices-card.ts
 +++ b/src/panels/lovelace/cards/hui-discovered-devices-card.ts
 @@ -20,6 +20,7 @@ import { showAddIntegrationDialog } from "../../config/integrations/show-add-int
@@ -148,7 +148,7 @@ index 1d7129aee..2399c975d 100644
      if (!this._config || !this.hass || this.hidden) {
        return nothing;
 diff --git a/src/panels/lovelace/cards/hui-distribution-card.ts b/src/panels/lovelace/cards/hui-distribution-card.ts
-index b3084c205..8230a2cdd 100644
+index 8c34791..073e6fe 100644
 --- a/src/panels/lovelace/cards/hui-distribution-card.ts
 +++ b/src/panels/lovelace/cards/hui-distribution-card.ts
 @@ -1,6 +1,6 @@
@@ -183,7 +183,7 @@ index b3084c205..8230a2cdd 100644
      if (!this._config || !this.hass) {
        return nothing;
 diff --git a/src/panels/lovelace/cards/hui-home-summary-card.ts b/src/panels/lovelace/cards/hui-home-summary-card.ts
-index 66e9037b5..50c11e85b 100644
+index 0245a9e..dfb9eab 100644
 --- a/src/panels/lovelace/cards/hui-home-summary-card.ts
 +++ b/src/panels/lovelace/cards/hui-home-summary-card.ts
 @@ -1,6 +1,6 @@
@@ -192,9 +192,9 @@ index 66e9037b5..50c11e85b 100644
 -import { css, html, LitElement, nothing } from "lit";
 +import { css, html, LitElement, nothing, type PropertyValues } from "lit";
  import { customElement, property, state } from "lit/decorators";
+ import { classMap } from "lit/directives/class-map";
  import { styleMap } from "lit/directives/style-map";
- import memoizeOne from "memoize-one";
-@@ -28,6 +28,7 @@ import { SubscribeMixin } from "../../../mixins/subscribe-mixin";
+@@ -29,6 +29,7 @@ import { SubscribeMixin } from "../../../mixins/subscribe-mixin";
  import type { HomeAssistant } from "../../../types";
  import { handleAction } from "../common/handle-action";
  import { hasAction } from "../common/has-action";
@@ -202,7 +202,7 @@ index 66e9037b5..50c11e85b 100644
  import {
    getSummaryLabel,
    HOME_SUMMARIES_COLORS,
-@@ -333,6 +334,18 @@ export class HuiHomeSummaryCard
+@@ -357,6 +358,18 @@ export class HuiHomeSummaryCard
      return "";
    }
  
@@ -222,7 +222,7 @@ index 66e9037b5..50c11e85b 100644
      if (!this._config || !this.hass) {
        return nothing;
 diff --git a/src/panels/lovelace/cards/hui-humidifier-card.ts b/src/panels/lovelace/cards/hui-humidifier-card.ts
-index e67271411..b943b22a1 100644
+index e672714..b943b22 100644
 --- a/src/panels/lovelace/cards/hui-humidifier-card.ts
 +++ b/src/panels/lovelace/cards/hui-humidifier-card.ts
 @@ -15,6 +15,7 @@ import type { HomeAssistant } from "../../../types";
@@ -246,7 +246,7 @@ index e67271411..b943b22a1 100644
      if (!this.hass || !this._config) {
        return nothing;
 diff --git a/src/panels/lovelace/cards/hui-picture-elements-card.ts b/src/panels/lovelace/cards/hui-picture-elements-card.ts
-index e774e3d75..22f7584b1 100644
+index e774e3d..22f7584 100644
 --- a/src/panels/lovelace/cards/hui-picture-elements-card.ts
 +++ b/src/panels/lovelace/cards/hui-picture-elements-card.ts
 @@ -12,6 +12,7 @@ import type {
@@ -279,7 +279,7 @@ index e774e3d75..22f7584b1 100644
      if (!this.hass || !this._config) {
        return nothing;
 diff --git a/src/panels/lovelace/cards/hui-repairs-card.ts b/src/panels/lovelace/cards/hui-repairs-card.ts
-index a5ef19716..e4b0cc550 100644
+index a5ef197..e4b0cc5 100644
 --- a/src/panels/lovelace/cards/hui-repairs-card.ts
 +++ b/src/panels/lovelace/cards/hui-repairs-card.ts
 @@ -16,6 +16,7 @@ import { SubscribeMixin } from "../../../mixins/subscribe-mixin";
@@ -303,10 +303,10 @@ index a5ef19716..e4b0cc550 100644
      if (!this._config || !this.hass || this.hidden) {
        return nothing;
 diff --git a/src/panels/lovelace/cards/hui-starting-card.ts b/src/panels/lovelace/cards/hui-starting-card.ts
-index 9fc36c778..f79bc698a 100644
+index 45756f4..63e7986 100644
 --- a/src/panels/lovelace/cards/hui-starting-card.ts
 +++ b/src/panels/lovelace/cards/hui-starting-card.ts
-@@ -7,6 +7,7 @@ import "../../../components/ha-card";
+@@ -8,6 +8,7 @@ import "../../../components/ha-card";
  import "../../../components/ha-spinner";
  import type { LovelaceCardConfig } from "../../../data/lovelace/config/card";
  import type { HomeAssistant } from "../../../types";
@@ -314,7 +314,7 @@ index 9fc36c778..f79bc698a 100644
  import type { LovelaceCard } from "../types";
  
  @customElement("hui-starting-card")
-@@ -31,6 +32,10 @@ export class HuiStartingCard extends LitElement implements LovelaceCard {
+@@ -32,6 +33,10 @@ export class HuiStartingCard extends LitElement implements LovelaceCard {
      }
    }
  
@@ -326,7 +326,7 @@ index 9fc36c778..f79bc698a 100644
      if (!this.hass) {
        return nothing;
 diff --git a/src/panels/lovelace/cards/hui-thermostat-card.ts b/src/panels/lovelace/cards/hui-thermostat-card.ts
-index f0e7e52e4..0b9c33dd6 100644
+index f0e7e52..0b9c33d 100644
 --- a/src/panels/lovelace/cards/hui-thermostat-card.ts
 +++ b/src/panels/lovelace/cards/hui-thermostat-card.ts
 @@ -16,6 +16,7 @@ import type { HomeAssistant } from "../../../types";
@@ -350,16 +350,10 @@ index f0e7e52e4..0b9c33dd6 100644
      if (!this.hass || !this._config) {
        return nothing;
 diff --git a/src/panels/lovelace/cards/hui-tile-card.ts b/src/panels/lovelace/cards/hui-tile-card.ts
-index e3bed20fe..67e0dc6c9 100644
+index 74265d8..fb1ae1c 100644
 --- a/src/panels/lovelace/cards/hui-tile-card.ts
 +++ b/src/panels/lovelace/cards/hui-tile-card.ts
-@@ -1,4 +1,5 @@
- import type { HassEntity } from "home-assistant-js-websocket";
-+import type { PropertyValues } from "lit";
- import { css, html, LitElement, nothing } from "lit";
- import { customElement, property, state } from "lit/decorators";
- import { classMap } from "lit/directives/class-map";
-@@ -26,6 +27,7 @@ import type { LovelaceCardFeatureContext } from "../card-features/types";
+@@ -32,6 +32,7 @@ import type { LovelaceCardFeatureContext } from "../card-features/types";
  import { findEntities } from "../common/find-entities";
  import { handleAction } from "../common/handle-action";
  import { hasAction } from "../common/has-action";
@@ -367,9 +361,9 @@ index e3bed20fe..67e0dc6c9 100644
  import { createEntityNotFoundWarning } from "../components/hui-warning";
  import type {
    LovelaceCard,
-@@ -244,6 +246,11 @@ export class HuiTileCard extends LitElement implements LovelaceCard {
-     return features;
-   });
+@@ -266,6 +267,11 @@ export class HuiTileCard extends LitElement implements LovelaceCard {
+     computeCardFeatureRows(config.features, this._featurePosition(config))
+   );
  
 +  protected shouldUpdate(changedProps: PropertyValues): boolean {
 +    if (changedProps.has("_featureContext")) return true;
@@ -380,7 +374,7 @@ index e3bed20fe..67e0dc6c9 100644
      if (!this._config || !this.hass) {
        return nothing;
 diff --git a/src/panels/lovelace/cards/hui-updates-card.ts b/src/panels/lovelace/cards/hui-updates-card.ts
-index a478bb7ca..2be6dabd6 100644
+index 4060c58..70de333 100644
 --- a/src/panels/lovelace/cards/hui-updates-card.ts
 +++ b/src/panels/lovelace/cards/hui-updates-card.ts
 @@ -17,6 +17,7 @@ import {
@@ -391,7 +385,7 @@ index a478bb7ca..2be6dabd6 100644
  import type { LovelaceCard, LovelaceGridOptions } from "../types";
  import { tileCardStyle } from "./tile/tile-card-style";
  import type { UpdatesCardConfig } from "./types";
-@@ -103,6 +104,19 @@ export class HuiUpdatesCard extends LitElement implements LovelaceCard {
+@@ -105,6 +106,19 @@ export class HuiUpdatesCard extends LitElement implements LovelaceCard {
      }
    }
  
@@ -412,12 +406,12 @@ index a478bb7ca..2be6dabd6 100644
      if (!this._config || !this.hass) {
        return nothing;
 diff --git a/src/panels/lovelace/components/hui-generic-entity-row.ts b/src/panels/lovelace/components/hui-generic-entity-row.ts
-index a038f956b..1766c713c 100644
+index c699c9d..616679e 100644
 --- a/src/panels/lovelace/components/hui-generic-entity-row.ts
 +++ b/src/panels/lovelace/components/hui-generic-entity-row.ts
-@@ -42,6 +42,56 @@ export class HuiGenericEntityRow extends LitElement {
- 
-   private _secondaryInfoElementId = "-" + uid();
+@@ -36,6 +36,56 @@ export class HuiGenericEntityRow extends LitElement {
+   @property({ attribute: "catch-interaction", type: Boolean })
+   public catchInteraction?;
  
 +  protected shouldUpdate(changedProps: PropertyValues): boolean {
 +    if (
@@ -473,19 +467,19 @@ index a038f956b..1766c713c 100644
      if (!this.hass || !this.config) {
        return nothing;
 diff --git a/src/panels/lovelace/components/hui-section-edit-mode.ts b/src/panels/lovelace/components/hui-section-edit-mode.ts
-index cca4f82f4..aa2ec9ecf 100644
+index cf50d0e..4ee137c 100644
 --- a/src/panels/lovelace/components/hui-section-edit-mode.ts
 +++ b/src/panels/lovelace/components/hui-section-edit-mode.ts
-@@ -6,7 +6,7 @@ import {
+@@ -7,7 +7,7 @@ import {
    mdiPencil,
    mdiPlusCircleMultipleOutline,
  } from "@mdi/js";
 -import type { CSSResultGroup, TemplateResult } from "lit";
 +import type { CSSResultGroup, PropertyValues, TemplateResult } from "lit";
- import { LitElement, css, html } from "lit";
+ import { LitElement, css, html, nothing } from "lit";
  import { customElement, property } from "lit/decorators";
  import "../../../components/ha-dropdown";
-@@ -17,6 +17,7 @@ import "../../../components/ha-svg-icon";
+@@ -19,6 +19,7 @@ import "../../../components/ha-tooltip";
  import { showConfirmationDialog } from "../../../dialogs/generic/show-dialog-box";
  import { haStyle } from "../../../resources/styles";
  import type { HomeAssistant } from "../../../types";
@@ -493,9 +487,9 @@ index cca4f82f4..aa2ec9ecf 100644
  import { deleteSection, duplicateSection } from "../editor/config-util";
  import { findLovelaceContainer } from "../editor/lovelace-path";
  import { showEditSectionDialog } from "../editor/section-editor/show-edit-section-dialog";
-@@ -32,6 +33,12 @@ export class HuiSectionEditMode extends LitElement {
- 
-   @property({ attribute: false }) public viewIndex!: number;
+@@ -37,6 +38,12 @@ export class HuiSectionEditMode extends LitElement {
+   @property({ type: Boolean, attribute: "is-strategy", reflect: true })
+   public isStrategy = false;
  
 +  protected shouldUpdate(changedProps: PropertyValues): boolean {
 +    const oldLovelace = changedProps.get("lovelace");
@@ -507,7 +501,7 @@ index cca4f82f4..aa2ec9ecf 100644
      return html`
        <div class="section-header">
 diff --git a/src/panels/lovelace/elements/hui-image-element.ts b/src/panels/lovelace/elements/hui-image-element.ts
-index fd6baaf6d..10ccac37d 100644
+index 8547c91..1fabc90 100644
 --- a/src/panels/lovelace/elements/hui-image-element.ts
 +++ b/src/panels/lovelace/elements/hui-image-element.ts
 @@ -1,3 +1,4 @@
@@ -559,7 +553,7 @@ index fd6baaf6d..10ccac37d 100644
      if (!this._config || !this.hass) {
        return nothing;
 diff --git a/src/panels/lovelace/header-footer/hui-graph-header-footer.ts b/src/panels/lovelace/header-footer/hui-graph-header-footer.ts
-index 1ca1a8185..512820b7b 100644
+index ddc9c7f..6d53418 100644
 --- a/src/panels/lovelace/header-footer/hui-graph-header-footer.ts
 +++ b/src/panels/lovelace/header-footer/hui-graph-header-footer.ts
 @@ -13,6 +13,7 @@ import {
@@ -583,7 +577,7 @@ index 1ca1a8185..512820b7b 100644
      if (!this._config || !this.hass) {
        return nothing;
 diff --git a/src/panels/lovelace/heading-badges/hui-entity-heading-badge.ts b/src/panels/lovelace/heading-badges/hui-entity-heading-badge.ts
-index 1fa7e5f50..00d55ab55 100644
+index 1fa7e5f..00d55ab 100644
 --- a/src/panels/lovelace/heading-badges/hui-entity-heading-badge.ts
 +++ b/src/panels/lovelace/heading-badges/hui-entity-heading-badge.ts
 @@ -1,5 +1,6 @@
@@ -613,11 +607,11 @@ index 1fa7e5f50..00d55ab55 100644
      if (!this.hass || !this._config) {
        return nothing;
 diff --git a/src/state-display/ha-timer-remaining-time.ts b/src/state-display/ha-timer-remaining-time.ts
-index 380efeaab..06058e9bc 100644
+index 6f3c609..b4e8352 100644
 --- a/src/state-display/ha-timer-remaining-time.ts
 +++ b/src/state-display/ha-timer-remaining-time.ts
-@@ -19,6 +19,19 @@ class HaTimerRemainingTime extends ReactiveElement {
-     return this;
+@@ -25,6 +25,19 @@ class HaTimerRemainingTime extends ReactiveElement {
+     }
    }
  
 +  protected shouldUpdate(changedProps: PropertyValues): boolean {
@@ -637,7 +631,7 @@ index 380efeaab..06058e9bc 100644
      super.update(changedProps);
      this.innerHTML =
 diff --git a/src/state-display/state-display.ts b/src/state-display/state-display.ts
-index a336dccb0..8cfd7ac2f 100644
+index c8d74c4..18eea54 100644
 --- a/src/state-display/state-display.ts
 +++ b/src/state-display/state-display.ts
 @@ -1,6 +1,7 @@
@@ -648,7 +642,7 @@ index a336dccb0..8cfd7ac2f 100644
  import { html, LitElement } from "lit";
  import { customElement, property } from "lit/decorators";
  import { join } from "lit/directives/join";
-@@ -248,6 +249,19 @@ class StateDisplay extends LitElement {
+@@ -259,6 +260,19 @@ class StateDisplay extends LitElement {
      return this.hass!.formatEntityAttributeValue(stateObj, content);
    }
  
@@ -669,7 +663,7 @@ index a336dccb0..8cfd7ac2f 100644
      const stateObj = this.stateObj;
      const contents = ensureArray(this._content);
 diff --git a/src/state-summary/state-card-alert.ts b/src/state-summary/state-card-alert.ts
-index d35c70def..e79bd7979 100755
+index d35c70d..e79bd79 100755
 --- a/src/state-summary/state-card-alert.ts
 +++ b/src/state-summary/state-card-alert.ts
 @@ -1,5 +1,5 @@
@@ -700,7 +694,7 @@ index d35c70def..e79bd7979 100755
      return html`
        <div class="horizontal justified layout">
 diff --git a/src/state-summary/state-card-button.ts b/src/state-summary/state-card-button.ts
-index 583f71765..8bf214d73 100644
+index 7c7412f..0f5bbe1 100644
 --- a/src/state-summary/state-card-button.ts
 +++ b/src/state-summary/state-card-button.ts
 @@ -1,5 +1,5 @@
@@ -708,11 +702,11 @@ index 583f71765..8bf214d73 100644
 -import type { CSSResultGroup } from "lit";
 +import type { CSSResultGroup, PropertyValues } from "lit";
  import { css, html, LitElement } from "lit";
- import { customElement, property } from "lit/decorators";
- import "../components/entity/ha-entity-toggle";
-@@ -17,6 +17,19 @@ class StateCardButton extends LitElement {
+ import { customElement, property, query } from "lit/decorators";
+ import { computeDomain } from "../common/entity/compute_domain";
+@@ -21,6 +21,19 @@ export class StateCardButton extends LitElement {
  
-   @property({ attribute: "in-dialog", type: Boolean }) public inDialog = false;
+   @query("ha-action-result") private _result!: HaActionResult;
  
 +  protected shouldUpdate(changedProps: PropertyValues): boolean {
 +    if (changedProps.has("stateObj") || changedProps.has("inDialog")) return true;
@@ -731,7 +725,7 @@ index 583f71765..8bf214d73 100644
      const stateObj = this.stateObj;
      return html`
 diff --git a/src/state-summary/state-card-climate.ts b/src/state-summary/state-card-climate.ts
-index f4fa2de7e..a666e64e5 100644
+index f4fa2de..a666e64 100644
 --- a/src/state-summary/state-card-climate.ts
 +++ b/src/state-summary/state-card-climate.ts
 @@ -1,5 +1,5 @@
@@ -762,7 +756,7 @@ index f4fa2de7e..a666e64e5 100644
      return html`
        <div class="horizontal justified layout">
 diff --git a/src/state-summary/state-card-configurator.ts b/src/state-summary/state-card-configurator.ts
-index d6632cfe6..112312651 100644
+index d6632cf..1123126 100644
 --- a/src/state-summary/state-card-configurator.ts
 +++ b/src/state-summary/state-card-configurator.ts
 @@ -2,7 +2,7 @@ import type { HassEntity } from "home-assistant-js-websocket";
@@ -795,7 +789,7 @@ index d6632cfe6..112312651 100644
      return html`
        <div class="horizontal justified layout">
 diff --git a/src/state-summary/state-card-content.ts b/src/state-summary/state-card-content.ts
-index b2c87e874..1dc9d5b6e 100644
+index b2c87e8..1dc9d5b 100644
 --- a/src/state-summary/state-card-content.ts
 +++ b/src/state-summary/state-card-content.ts
 @@ -1,3 +1,4 @@
@@ -826,7 +820,7 @@ index b2c87e874..1dc9d5b6e 100644
      let stateCard: string;
      if (!this.stateObj || !this.hass) return nothing;
 diff --git a/src/state-summary/state-card-cover.ts b/src/state-summary/state-card-cover.ts
-index 401978797..acbf175a0 100644
+index 4019787..acbf175 100644
 --- a/src/state-summary/state-card-cover.ts
 +++ b/src/state-summary/state-card-cover.ts
 @@ -1,4 +1,4 @@
@@ -856,7 +850,7 @@ index 401978797..acbf175a0 100644
      return html`
        <div class="horizontal justified layout">
 diff --git a/src/state-summary/state-card-display.ts b/src/state-summary/state-card-display.ts
-index 319be0b40..168b3225e 100755
+index b392226..3b5bd44 100755
 --- a/src/state-summary/state-card-display.ts
 +++ b/src/state-summary/state-card-display.ts
 @@ -1,5 +1,5 @@
@@ -887,7 +881,7 @@ index 319be0b40..168b3225e 100755
      return html`
        <div class="horizontal justified layout">
 diff --git a/src/state-summary/state-card-event.ts b/src/state-summary/state-card-event.ts
-index 970bb8fe4..88a167e77 100644
+index 3d78442..6b9113c 100644
 --- a/src/state-summary/state-card-event.ts
 +++ b/src/state-summary/state-card-event.ts
 @@ -1,5 +1,5 @@
@@ -896,8 +890,8 @@ index 970bb8fe4..88a167e77 100644
 +import type { CSSResultGroup, PropertyValues } from "lit";
  import { css, html, LitElement } from "lit";
  import { customElement, property } from "lit/decorators";
- import "../components/entity/ha-entity-toggle";
-@@ -15,6 +15,19 @@ class StateCardEvent extends LitElement {
+ import "../components/entity/state-info";
+@@ -14,6 +14,19 @@ class StateCardEvent extends LitElement {
  
    @property({ attribute: "in-dialog", type: Boolean }) public inDialog = false;
  
@@ -918,7 +912,7 @@ index 970bb8fe4..88a167e77 100644
      return html`
        <div class="horizontal justified layout">
 diff --git a/src/state-summary/state-card-humidifier.ts b/src/state-summary/state-card-humidifier.ts
-index a855a9e72..1c80be968 100644
+index a855a9e..1c80be9 100644
 --- a/src/state-summary/state-card-humidifier.ts
 +++ b/src/state-summary/state-card-humidifier.ts
 @@ -1,5 +1,5 @@
@@ -948,39 +942,8 @@ index a855a9e72..1c80be968 100644
    protected render(): TemplateResult {
      return html`
        <div class="horizontal justified layout">
-diff --git a/src/state-summary/state-card-input_button.ts b/src/state-summary/state-card-input_button.ts
-index cb0f8cea3..8647f9c52 100644
---- a/src/state-summary/state-card-input_button.ts
-+++ b/src/state-summary/state-card-input_button.ts
-@@ -1,5 +1,5 @@
- import type { HassEntity } from "home-assistant-js-websocket";
--import type { CSSResultGroup } from "lit";
-+import type { CSSResultGroup, PropertyValues } from "lit";
- import { css, html, LitElement } from "lit";
- import { customElement, property } from "lit/decorators";
- import "../components/entity/ha-entity-toggle";
-@@ -17,6 +17,19 @@ class StateCardInputButton extends LitElement {
- 
-   @property({ attribute: "in-dialog", type: Boolean }) public inDialog = false;
- 
-+  protected shouldUpdate(changedProps: PropertyValues): boolean {
-+    if (changedProps.has("stateObj") || changedProps.has("inDialog")) return true;
-+    if (!changedProps.has("hass")) return false;
-+    const oldHass = changedProps.get("hass");
-+    if (!oldHass) return true;
-+    if (oldHass.locale !== this.hass!.locale ||
-+        oldHass.localize !== this.hass!.localize ||
-+        oldHass.formatEntityState !== this.hass!.formatEntityState ||
-+        oldHass.formatEntityAttributeName !== this.hass!.formatEntityAttributeName ||
-+        oldHass.formatEntityAttributeValue !== this.hass!.formatEntityAttributeValue) return true;
-+    return false;
-+  }
-+
-   protected render() {
-     const stateObj = this.stateObj;
-     return html`
 diff --git a/src/state-summary/state-card-input_number.ts b/src/state-summary/state-card-input_number.ts
-index 5fa365b96..4641ef8dc 100644
+index 929f3c8..c87f38e 100644
 --- a/src/state-summary/state-card-input_number.ts
 +++ b/src/state-summary/state-card-input_number.ts
 @@ -1,5 +1,5 @@
@@ -990,7 +953,7 @@ index 5fa365b96..4641ef8dc 100644
  import { css, html, LitElement, nothing } from "lit";
  import { customElement, property } from "lit/decorators";
  import { debounce } from "../common/util/debounce";
-@@ -45,6 +45,19 @@ class StateCardInputNumber extends LitElement {
+@@ -48,6 +48,19 @@ class StateCardInputNumber extends LitElement {
      this._attachObserver();
    }
  
@@ -1011,7 +974,7 @@ index 5fa365b96..4641ef8dc 100644
      return html`
        <state-info
 diff --git a/src/state-summary/state-card-input_select.ts b/src/state-summary/state-card-input_select.ts
-index 90d4df236..f95985adb 100644
+index 90d4df2..f95985a 100644
 --- a/src/state-summary/state-card-input_select.ts
 +++ b/src/state-summary/state-card-input_select.ts
 @@ -1,4 +1,4 @@
@@ -1041,10 +1004,10 @@ index 90d4df236..f95985adb 100644
      const options = this.stateObj.attributes.options.map((option) => ({
        value: option,
 diff --git a/src/state-summary/state-card-input_text.ts b/src/state-summary/state-card-input_text.ts
-index 514a2b468..71fef936e 100644
+index 9467f8d..2e3376f 100644
 --- a/src/state-summary/state-card-input_text.ts
 +++ b/src/state-summary/state-card-input_text.ts
-@@ -19,6 +19,19 @@ class StateCardInputText extends LitElement {
+@@ -20,6 +20,19 @@ class StateCardInputText extends LitElement {
  
    @state() public value = "";
  
@@ -1065,7 +1028,7 @@ index 514a2b468..71fef936e 100644
      return html`
        <div class="horizontal justified layout">
 diff --git a/src/state-summary/state-card-lawn_mower.ts b/src/state-summary/state-card-lawn_mower.ts
-index 41044d556..a40dcf2a4 100644
+index 41044d5..a40dcf2 100644
 --- a/src/state-summary/state-card-lawn_mower.ts
 +++ b/src/state-summary/state-card-lawn_mower.ts
 @@ -1,5 +1,5 @@
@@ -1096,7 +1059,7 @@ index 41044d556..a40dcf2a4 100644
      const stateObj = this.stateObj;
      return html`
 diff --git a/src/state-summary/state-card-lock.ts b/src/state-summary/state-card-lock.ts
-index 7cc685fc7..a7e59db93 100644
+index 7cc685f..a7e59db 100644
 --- a/src/state-summary/state-card-lock.ts
 +++ b/src/state-summary/state-card-lock.ts
 @@ -1,5 +1,5 @@
@@ -1127,7 +1090,7 @@ index 7cc685fc7..a7e59db93 100644
      const isLocked = this.stateObj.state === "locked";
      const supportsOpen = supportsFeature(this.stateObj, LockEntityFeature.OPEN);
 diff --git a/src/state-summary/state-card-media_player.ts b/src/state-summary/state-card-media_player.ts
-index 57f279d2b..4c78904f6 100644
+index 57f279d..4c78904 100644
 --- a/src/state-summary/state-card-media_player.ts
 +++ b/src/state-summary/state-card-media_player.ts
 @@ -1,5 +1,5 @@
@@ -1158,7 +1121,7 @@ index 57f279d2b..4c78904f6 100644
      const playerObj = new HassMediaPlayerEntity(this.hass, this.stateObj);
      return html`
 diff --git a/src/state-summary/state-card-number.ts b/src/state-summary/state-card-number.ts
-index 45c6d3254..35c420289 100644
+index 2b7746f..7f7527d 100644
 --- a/src/state-summary/state-card-number.ts
 +++ b/src/state-summary/state-card-number.ts
 @@ -1,5 +1,5 @@
@@ -1168,7 +1131,7 @@ index 45c6d3254..35c420289 100644
  import { css, html, LitElement, nothing } from "lit";
  import { customElement, property } from "lit/decorators";
  import { debounce } from "../common/util/debounce";
-@@ -46,6 +46,19 @@ class StateCardNumber extends LitElement {
+@@ -49,6 +49,19 @@ class StateCardNumber extends LitElement {
      this._attachObserver();
    }
  
@@ -1189,7 +1152,7 @@ index 45c6d3254..35c420289 100644
      return html`
        <state-info
 diff --git a/src/state-summary/state-card-scene.ts b/src/state-summary/state-card-scene.ts
-index d756dacdd..a9123fd83 100644
+index d756dac..a9123fd 100644
 --- a/src/state-summary/state-card-scene.ts
 +++ b/src/state-summary/state-card-scene.ts
 @@ -1,5 +1,5 @@
@@ -1220,7 +1183,7 @@ index d756dacdd..a9123fd83 100644
      return html`
        <div class="horizontal justified layout">
 diff --git a/src/state-summary/state-card-script.ts b/src/state-summary/state-card-script.ts
-index 4c3753ded..111a4da99 100644
+index bde6761..eab700b 100644
 --- a/src/state-summary/state-card-script.ts
 +++ b/src/state-summary/state-card-script.ts
 @@ -1,5 +1,5 @@
@@ -1229,8 +1192,8 @@ index 4c3753ded..111a4da99 100644
 +import type { CSSResultGroup, PropertyValues } from "lit";
  import { html, LitElement } from "lit";
  import { customElement, property } from "lit/decorators";
- import "../components/entity/ha-entity-toggle";
-@@ -20,6 +20,19 @@ class StateCardScript extends LitElement {
+ import "../components/entity/state-info";
+@@ -19,6 +19,19 @@ class StateCardScript extends LitElement {
  
    @property({ attribute: "in-dialog", type: Boolean }) public inDialog = false;
  
@@ -1251,7 +1214,7 @@ index 4c3753ded..111a4da99 100644
      const stateObj = this.stateObj as ScriptEntity;
      return html`
 diff --git a/src/state-summary/state-card-select.ts b/src/state-summary/state-card-select.ts
-index 18e28f215..fd4703a4f 100644
+index 18e28f2..fd4703a 100644
 --- a/src/state-summary/state-card-select.ts
 +++ b/src/state-summary/state-card-select.ts
 @@ -1,4 +1,4 @@
@@ -1281,7 +1244,7 @@ index 18e28f215..fd4703a4f 100644
      const options = this.stateObj.attributes.options.map((option) => ({
        value: option,
 diff --git a/src/state-summary/state-card-text.ts b/src/state-summary/state-card-text.ts
-index 953fe069b..a9f269857 100644
+index 73e957a..1318081 100644
 --- a/src/state-summary/state-card-text.ts
 +++ b/src/state-summary/state-card-text.ts
 @@ -1,4 +1,4 @@
@@ -1290,7 +1253,7 @@ index 953fe069b..a9f269857 100644
  import { css, html, LitElement } from "lit";
  import { customElement, property } from "lit/decorators";
  import { stopPropagation } from "../common/dom/stop_propagation";
-@@ -17,6 +17,19 @@ class StateCardText extends LitElement {
+@@ -18,6 +18,19 @@ class StateCardText extends LitElement {
  
    @property({ attribute: false }) public stateObj!: TextEntity;
  
@@ -1311,7 +1274,7 @@ index 953fe069b..a9f269857 100644
      return html`
        <state-badge .stateObj=${this.stateObj}></state-badge>
 diff --git a/src/state-summary/state-card-timer.ts b/src/state-summary/state-card-timer.ts
-index f83fdeb33..721b3ced3 100644
+index f83fdeb..721b3ce 100644
 --- a/src/state-summary/state-card-timer.ts
 +++ b/src/state-summary/state-card-timer.ts
 @@ -1,5 +1,5 @@
@@ -1342,7 +1305,7 @@ index f83fdeb33..721b3ced3 100644
      return html`
        <div class="horizontal justified layout">
 diff --git a/src/state-summary/state-card-toggle.ts b/src/state-summary/state-card-toggle.ts
-index 68ac92bbf..ff18cc699 100644
+index 68ac92b..ff18cc6 100644
 --- a/src/state-summary/state-card-toggle.ts
 +++ b/src/state-summary/state-card-toggle.ts
 @@ -1,5 +1,5 @@
@@ -1373,7 +1336,7 @@ index 68ac92bbf..ff18cc699 100644
      return html`
        <div class="horizontal justified layout">
 diff --git a/src/state-summary/state-card-update.ts b/src/state-summary/state-card-update.ts
-index baa898d6b..8c68b988c 100755
+index baa898d..8c68b98 100755
 --- a/src/state-summary/state-card-update.ts
 +++ b/src/state-summary/state-card-update.ts
 @@ -1,4 +1,4 @@
@@ -1403,7 +1366,7 @@ index baa898d6b..8c68b988c 100755
      return html`
        <div class="horizontal justified layout">
 diff --git a/src/state-summary/state-card-vacuum.ts b/src/state-summary/state-card-vacuum.ts
-index 6f478d9f4..4d8c293d5 100644
+index 6f478d9..4d8c293 100644
 --- a/src/state-summary/state-card-vacuum.ts
 +++ b/src/state-summary/state-card-vacuum.ts
 @@ -1,5 +1,5 @@
@@ -1434,7 +1397,7 @@ index 6f478d9f4..4d8c293d5 100644
      return html`
        <div class="horizontal justified layout">
 diff --git a/src/state-summary/state-card-water_heater.ts b/src/state-summary/state-card-water_heater.ts
-index 06fd81bab..aeb0f3f28 100644
+index 06fd81b..aeb0f3f 100644
 --- a/src/state-summary/state-card-water_heater.ts
 +++ b/src/state-summary/state-card-water_heater.ts
 @@ -1,5 +1,5 @@

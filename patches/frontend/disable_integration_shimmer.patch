@@ -1,8 +1,8 @@
 diff --git a/src/panels/config/integrations/ha-config-integration-page.ts b/src/panels/config/integrations/ha-config-integration-page.ts
-index bbc8638c5..b313f22f1 100644
+index 669423a..9b48a87 100644
 --- a/src/panels/config/integrations/ha-config-integration-page.ts
 +++ b/src/panels/config/integrations/ha-config-integration-page.ts
-@@ -1406,7 +1406,6 @@ class HaConfigIntegrationPage extends SubscribeMixin(LitElement) {
+@@ -1506,7 +1506,6 @@ class HaConfigIntegrationPage extends SubscribeMixin(LitElement) {
          .quality-scale {
            mask: linear-gradient(-60deg, #000 30%, #0005, #000 70%) right/350%
              100%;

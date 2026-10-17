@@ -1,4 +1,4 @@
-ARG HA_IMAGE=ghcr.io/home-assistant/home-assistant:2026.8.1
+ARG HA_IMAGE=ghcr.io/home-assistant/home-assistant:2026.10.2
 
 FROM ${HA_IMAGE} AS extract
 
@@ -11,7 +11,8 @@ RUN pip show home-assistant-frontend | grep ^Version: | cut -d' ' -f2 | tr -d '\
 FROM node:24-alpine AS build
 
 RUN sed -i 's|https://dl-cdn.alpinelinux.org/alpine|https://mirrors.edge.kernel.org/alpine|g' /etc/apk/repositories && \
-    apk add --no-cache git patch python3
+    apk add --no-cache git patch python3 && \
+    corepack enable
 
 COPY --from=extract /frontend_version /frontend_version
 COPY --from=extract /translations_built /translations_built
@@ -44,7 +45,7 @@ COPY utils/unflatten_translations.py /unflatten_translations.py
 RUN python3 /unflatten_translations.py
 
 RUN cd /frontend && \
-    yarn install && \
+    pnpm install --frozen-lockfile && \
     ./node_modules/.bin/gulp build-app && \
     echo "// Build: $(date +%s)" >> hass_frontend/sw-modern.js && \
     echo "// Build: $(date +%s)" >> hass_frontend/sw-legacy.js

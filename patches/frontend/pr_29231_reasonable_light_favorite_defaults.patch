@@ -1,8 +1,8 @@
 diff --git a/src/data/light.ts b/src/data/light.ts
-index 83d4bae02..21117dcff 100644
+index c0f0081..fbaff7d 100644
 --- a/src/data/light.ts
 +++ b/src/data/light.ts
-@@ -106,12 +106,13 @@ export type LightColor =
+@@ -103,12 +103,13 @@ export type LightColor =
        rgbww_color: [number, number, number, number, number];
      };
  
@@ -21,7 +21,7 @@ index 83d4bae02..21117dcff 100644
  ] as LightColor[];
  
  export const computeDefaultFavoriteColors = (
-@@ -126,26 +127,54 @@ export const computeDefaultFavoriteColors = (
+@@ -123,26 +124,54 @@ export const computeDefaultFavoriteColors = (
  
    const supportsColor = lightSupportsColor(stateObj);
  
@@ -96,18 +96,18 @@ index 83d4bae02..21117dcff 100644
  
    if (supportsColor) {
 diff --git a/src/dialogs/more-info/components/lights/ha-more-info-light-favorite-colors.ts b/src/dialogs/more-info/components/lights/ha-more-info-light-favorite-colors.ts
-index 4ca24db54..bc33ec739 100644
+index 2ec3018..5464592 100644
 --- a/src/dialogs/more-info/components/lights/ha-more-info-light-favorite-colors.ts
 +++ b/src/dialogs/more-info/components/lights/ha-more-info-light-favorite-colors.ts
 @@ -1,6 +1,6 @@
- import { consume, type ContextType } from "@lit/context";
+ import type { ContextType } from "@lit/context";
  import type { PropertyValues, TemplateResult } from "lit";
 -import { LitElement, html } from "lit";
 +import { LitElement, css, html } from "lit";
  import { customElement, property, state } from "lit/decorators";
+ import { consume } from "../../../../common/decorators/consume";
  import { consumeLocalize } from "../../../../common/decorators/consume-context-entry";
- import type { HASSDomEvent } from "../../../../common/dom/fire_event";
-@@ -46,6 +46,12 @@ export class HaMoreInfoLightFavoriteColors extends LitElement {
+@@ -47,6 +47,12 @@ export class HaMoreInfoLightFavoriteColors extends LitElement {
  
    @state() private _favoriteColors: LightColor[] = [];
  
